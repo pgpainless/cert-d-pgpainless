@@ -9,7 +9,6 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
-        mavenLocal()
         mavenCentral()
     }
     dependencies {
@@ -43,7 +42,7 @@ allprojects {
     }
 
     group 'org.pgpainless'
-    description = "Shared PGP Certificate Directory for Java"
+    description = "PGPainless implementation of the Shared PGP Certificate Directory"
     version = shortVersion
 
     sourceCompatibility = javaSourceCompatibility
@@ -62,6 +61,9 @@ allprojects {
         slf4jVersion = '1.7.32'
         logbackVersion = '1.2.9'
         junitVersion = '5.8.2'
+        mockitoVersion = '4.2.0'
+        pgpainlessVersion = '1.1.1'
+        pgpCertDJavaVersion = '0.1.0'
         rootConfigDir = new File(rootDir, 'config')
         gitCommit = getGitCommit()
         isContinuousIntegrationEnvironment = Boolean.parseBoolean(System.getenv('CI'))
@@ -132,15 +134,15 @@ subprojects {
                 artifact javadocJar
                 artifact testsJar
                 pom {
-                    name = 'Cert-D-Java'
-                    description = 'Shared PGP Certificate Directory for Java'
-                    url = 'https://github.com/pgpainless/cert-d-java'
+                    name = 'Cert-D-PGPainless'
+                    description = 'PGPainless implementation of the Shared PGP Certificate Directory'
+                    url = 'https://github.com/pgpainless/cert-d-pgpainless'
                     inceptionYear = '2022'
 
                     scm {
-                        url = 'https://github.com/pgpainless/cert-d-java'
-                        connection = 'scm:https://github.com/pgpainless/cert-d-java'
-                        developerConnection = 'scm:git://github.com/pgpainless/cert-d-java.git'
+                        url = 'https://github.com/pgpainless/cert-d-pgpainless'
+                        connection = 'scm:https://github.com/pgpainless/cert-d-pgpainless'
+                        developerConnection = 'scm:git://github.com/pgpainless/cert-d-pgpainless.git'
                     }
 
                     licenses {

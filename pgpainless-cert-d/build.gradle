@@ -12,7 +12,12 @@ repositories {
     mavenCentral()
 }
 
+apply plugin: 'ru.vyarus.animalsniffer'
+
 dependencies {
+    // animal sniffer
+    signature "net.sf.androidscents.signature:android-api-level-${minAndroidSdk}:2.3.3_r2@signature"
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
@@ -22,8 +27,12 @@ dependencies {
     // Logging
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 
-    api project(":pgpainless-core")
-    api project(":pgp-cert-d-java")
+    api "org.pgpainless:pgpainless-core:$pgpainlessVersion"
+    api "org.pgpainless:pgp-cert-d-java:$pgpCertDJavaVersion"
+}
+
+animalsniffer {
+    sourceSets = [sourceSets.main]
 }
 
 test {

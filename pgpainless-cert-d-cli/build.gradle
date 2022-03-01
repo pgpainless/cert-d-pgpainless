@@ -20,7 +20,7 @@ dependencies {
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 
     implementation project(":pgpainless-cert-d")
-    implementation project(":pgp-cert-d-java-jdbc-sqlite-lookup")
+    implementation "org.pgpainless:pgp-cert-d-java-jdbc-sqlite-lookup:$pgpCertDJavaVersion"
 
     // picocli for cli
     implementation "info.picocli:picocli:4.6.2"
@@ -33,7 +33,7 @@ test {
 mainClassName = 'pgp.cert_d.cli.PGPCertDCli'
 
 jar {
-    dependsOn(":pgpainless-cert-d:assemble", ":pgp-certificate-store:assemble", ":pgp-cert-d-java:assemble", ":pgpainless-core:assemble")
+    dependsOn(":pgpainless-cert-d:assemble")
     manifest {
         attributes 'Main-Class': "$mainClassName"
     }
