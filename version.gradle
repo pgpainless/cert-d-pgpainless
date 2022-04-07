@@ -8,5 +8,11 @@ allprojects {
         isSnapshot = true
         minAndroidSdk = 10
         javaSourceCompatibility = 1.8
+        slf4jVersion = '1.7.32'
+        logbackVersion = '1.2.9'
+        junitVersion = '5.8.2'
+        mockitoVersion = '4.2.0'
+        pgpainlessVersion = '1.2.0'
+        pgpCertDJavaVersion = '0.1.0'
     }
 }

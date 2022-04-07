@@ -58,12 +58,6 @@ allprojects {
     }
 
     project.ext {
-        slf4jVersion = '1.7.32'
-        logbackVersion = '1.2.9'
-        junitVersion = '5.8.2'
-        mockitoVersion = '4.2.0'
-        pgpainlessVersion = '1.1.3'
-        pgpCertDJavaVersion = '0.1.0'
         rootConfigDir = new File(rootDir, 'config')
         gitCommit = getGitCommit()
         isContinuousIntegrationEnvironment = Boolean.parseBoolean(System.getenv('CI'))
