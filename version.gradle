@@ -11,7 +11,7 @@ allprojects {
         slf4jVersion = '1.7.36'
         logbackVersion = '1.2.11'
         junitVersion = '5.8.2'
-        mockitoVersion = '4.2.0'
+        mockitoVersion = '4.5.1'
         pgpainlessVersion = '1.2.0'
         pgpCertDJavaVersion = '0.1.0'
     }
