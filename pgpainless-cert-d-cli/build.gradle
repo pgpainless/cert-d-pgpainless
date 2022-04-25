@@ -13,13 +13,17 @@ repositories {
 }
 
 dependencies {
+    // Junit
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 
     // Logging
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 
+    // pgp.cert.d using PGPainless
     implementation project(":pgpainless-cert-d")
+
+    // SQL subkey table
     implementation "org.pgpainless:pgp-cert-d-java-jdbc-sqlite-lookup:$pgpCertDJavaVersion"
 
     // picocli for cli

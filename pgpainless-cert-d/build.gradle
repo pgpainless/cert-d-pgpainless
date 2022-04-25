@@ -15,19 +15,24 @@ repositories {
 apply plugin: 'ru.vyarus.animalsniffer'
 
 dependencies {
-    // animal sniffer
+    // animal sniffer for ensuring Android API compatibility
     signature "net.sf.androidscents.signature:android-api-level-${minAndroidSdk}:2.3.3_r2@signature"
 
+    // JUnit
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 
+    // Mockito for mocking during tests
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
 
     // Logging
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 
+    // PGPainless for OpenPGP
     api "org.pgpainless:pgpainless-core:$pgpainlessVersion"
+
+    // pgp.cert.d
     api "org.pgpainless:pgp-cert-d-java:$pgpCertDJavaVersion"
 }
 
