@@ -8,7 +8,7 @@ allprojects {
         isSnapshot = true
         minAndroidSdk = 10
         javaSourceCompatibility = 1.8
-        slf4jVersion = '1.7.32'
+        slf4jVersion = '1.7.36'
         logbackVersion = '1.2.9'
         junitVersion = '5.8.2'
         mockitoVersion = '4.2.0'
