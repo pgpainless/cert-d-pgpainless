@@ -22,6 +22,8 @@ import java.io.File;
 import java.sql.SQLException;
 
 @CommandLine.Command(
+        name = "certificate-store",
+        description = "Store and manage public OpenPGP certificates",
         subcommands = {
                 Import.class,
                 MultiImport.class,
