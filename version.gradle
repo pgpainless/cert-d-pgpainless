@@ -9,7 +9,7 @@ allprojects {
         minAndroidSdk = 10
         javaSourceCompatibility = 1.8
         slf4jVersion = '1.7.36'
-        logbackVersion = '1.2.9'
+        logbackVersion = '1.2.11'
         junitVersion = '5.8.2'
         mockitoVersion = '4.2.0'
         pgpainlessVersion = '1.2.0'
