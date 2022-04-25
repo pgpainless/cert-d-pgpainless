@@ -23,7 +23,7 @@ dependencies {
     implementation "org.pgpainless:pgp-cert-d-java-jdbc-sqlite-lookup:$pgpCertDJavaVersion"
 
     // picocli for cli
-    implementation "info.picocli:picocli:4.6.2"
+    implementation "info.picocli:picocli:$picocliVersion"
 }
 
 test {
