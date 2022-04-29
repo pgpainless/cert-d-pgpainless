@@ -49,6 +49,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 
     // Reproducible Builds
