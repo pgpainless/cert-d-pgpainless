@@ -24,14 +24,7 @@ import java.io.IOException;
 public class MultiImport implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiImport.class);
-
-    // TODO: Replace with proper merge callback
-    private final MergeCallback dummyMerge = new MergeCallback() {
-        @Override
-        public Certificate merge(Certificate data, Certificate existing) throws IOException {
-            return data;
-        }
-    };
+    private final MergeCallback dummyMerge = new DefaultMergeCallback();
 
     @Override
     public void run() {
@@ -41,9 +34,6 @@ public class MultiImport implements Runnable {
                 ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
                 Certificate certificate = PGPCertDCli.getCertificateDirectory()
                         .insertCertificate(certIn, dummyMerge);
-                // CHECKSTYLE:OFF
-                System.out.println(certificate.getFingerprint());
-                // CHECKSTYLE:ON
             }
         } catch (IOException e) {
             LOGGER.error("IO-Error.", e);

@@ -4,8 +4,6 @@
 
 package pgp.cert_d.cli.commands;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pgp.cert_d.cli.PGPCertDCli;
@@ -14,27 +12,19 @@ import pgp.certificate_store.MergeCallback;
 import pgp.certificate_store.exception.BadDataException;
 import picocli.CommandLine;
 
+import java.io.IOException;
+
 @CommandLine.Command(name = "import",
         description = "Import or update a certificate")
 public class Import implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Import.class);
-
-    // TODO: Replace with proper merge callback
-    private final MergeCallback dummyMerge = new MergeCallback() {
-        @Override
-        public Certificate merge(Certificate data, Certificate existing) throws IOException {
-            return data;
-        }
-    };
+    private final MergeCallback mergeCallback = new DefaultMergeCallback();
 
     @Override
     public void run() {
         try {
-            Certificate certificate = PGPCertDCli.getCertificateDirectory().insertCertificate(System.in, dummyMerge);
-            // CHECKSTYLE:OFF
-            System.out.println(certificate.getFingerprint());
-            // CHECKSTYLE:ON
+            Certificate certificate = PGPCertDCli.getCertificateDirectory().insertCertificate(System.in, mergeCallback);
         } catch (IOException e) {
             LOGGER.error("IO-Error.", e);
             System.exit(-1);
