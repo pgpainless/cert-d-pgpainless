@@ -15,8 +15,10 @@ import pgp.cert_d.SharedPGPCertificateDirectory;
 import pgp.cert_d.SpecialNames;
 import pgp.certificate_store.Certificate;
 import pgp.certificate_store.CertificateDirectory;
+import pgp.certificate_store.CertificateMerger;
 import pgp.certificate_store.CertificateStore;
-import pgp.certificate_store.MergeCallback;
+import pgp.certificate_store.Key;
+import pgp.certificate_store.KeyMerger;
 import pgp.certificate_store.SubkeyLookup;
 import pgp.certificate_store.exception.BadDataException;
 import pgp.certificate_store.exception.BadNameException;
@@ -66,7 +68,7 @@ public class SharedPGPCertificateDirectoryAdapter
     }
 
     @Override
-    public Certificate insertCertificate(InputStream data, MergeCallback merge)
+    public Certificate insertCertificate(InputStream data, CertificateMerger merge)
             throws IOException, InterruptedException, BadDataException {
         Certificate certificate = directory.insert(data, merge);
         storeIdentifierForSubkeys(certificate);
@@ -74,7 +76,7 @@ public class SharedPGPCertificateDirectoryAdapter
     }
 
     @Override
-    public Certificate tryInsertCertificate(InputStream data, MergeCallback merge)
+    public Certificate tryInsertCertificate(InputStream data, CertificateMerger merge)
             throws IOException, BadDataException {
         Certificate certificate = directory.tryInsert(data, merge);
         storeIdentifierForSubkeys(certificate);
@@ -82,13 +84,13 @@ public class SharedPGPCertificateDirectoryAdapter
     }
 
     @Override
-    public Certificate insertCertificateBySpecialName(String specialName, InputStream data, MergeCallback merge)
+    public Certificate insertCertificateBySpecialName(String specialName, InputStream data, CertificateMerger merge)
             throws IOException, InterruptedException, BadDataException, BadNameException {
         return directory.insertWithSpecialName(specialName, data, merge);
     }
 
     @Override
-    public Certificate tryInsertCertificateBySpecialName(String specialName, InputStream data, MergeCallback merge)
+    public Certificate tryInsertCertificateBySpecialName(String specialName, InputStream data, CertificateMerger merge)
             throws IOException, BadDataException, BadNameException {
         return directory.tryInsertWithSpecialName(specialName, data, merge);
     }
@@ -119,5 +121,25 @@ public class SharedPGPCertificateDirectoryAdapter
     @Override
     public void storeCertificateSubkeyIds(String certificate, List<Long> subkeyIds) throws IOException {
         subkeyLookup.storeCertificateSubkeyIds(certificate, subkeyIds);
+    }
+
+    @Override
+    public Key getTrustRoot() throws IOException, BadDataException {
+        return directory.getTrustRoot();
+    }
+
+    @Override
+    public Key getTrustRootIfChanged(String tag) throws IOException, BadDataException {
+        return directory.getTrustRootIfChanged(tag);
+    }
+
+    @Override
+    public Key insertTrustRoot(InputStream data, KeyMerger keyMerger) throws IOException, InterruptedException, BadDataException {
+        return directory.insertTrustRoot(data, keyMerger);
+    }
+
+    @Override
+    public Key tryInsertTrustRoot(InputStream data, KeyMerger keyMerger) throws IOException, BadDataException {
+        return directory.tryInsertTrustRoot(data, keyMerger);
     }
 }

@@ -5,6 +5,7 @@
 package pgp.cert_d.cli;
 
 import org.pgpainless.certificate_store.CertificateReader;
+import org.pgpainless.certificate_store.KeyReader;
 import org.pgpainless.certificate_store.SharedPGPCertificateDirectoryAdapter;
 import pgp.cert_d.BaseDirectoryProvider;
 import pgp.cert_d.SharedPGPCertificateDirectoryImpl;
@@ -12,6 +13,7 @@ import pgp.cert_d.cli.commands.Export;
 import pgp.cert_d.cli.commands.Get;
 import pgp.cert_d.cli.commands.Insert;
 import pgp.cert_d.cli.commands.Import;
+import pgp.cert_d.cli.commands.Setup;
 import pgp.cert_d.jdbc.sqlite.DatabaseSubkeyLookup;
 import pgp.cert_d.jdbc.sqlite.SqliteSubkeyLookupDaoImpl;
 import pgp.certificate_store.SubkeyLookup;
@@ -26,15 +28,19 @@ import java.sql.SQLException;
         name = "certificate-store",
         description = "Store and manage public OpenPGP certificates",
         subcommands = {
+                CommandLine.HelpCommand.class,
                 Export.class,
                 Insert.class,
                 Import.class,
                 Get.class,
+                Setup.class
         }
 )
 public class PGPCertDCli {
 
-    @CommandLine.Option(names = "--base-directory", paramLabel = "DIRECTORY", description = "Overwrite the default certificate directory")
+    @CommandLine.Option(names = {"-s", "--store"}, paramLabel = "DIRECTORY",
+            description = "Overwrite the default certificate directory path",
+            scope = CommandLine.ScopeType.INHERIT)
     File baseDirectory;
 
     private static CertificateDirectory certificateDirectory;
@@ -57,7 +63,8 @@ public class PGPCertDCli {
 
         certificateDirectory = new SharedPGPCertificateDirectoryImpl(
                 baseDirectory,
-                new CertificateReader());
+                new CertificateReader(),
+                new KeyReader());
         subkeyLookup = new DatabaseSubkeyLookup(
                 SqliteSubkeyLookupDaoImpl.forDatabaseFile(new File(baseDirectory, "_pgpainless_subkey_map.db")));
 

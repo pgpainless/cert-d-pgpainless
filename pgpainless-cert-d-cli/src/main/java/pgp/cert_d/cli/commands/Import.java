@@ -10,9 +10,9 @@ import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.pgpainless.PGPainless;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pgp.cert_d.cli.MergeCallbacks;
 import pgp.cert_d.cli.PGPCertDCli;
 import pgp.certificate_store.Certificate;
-import pgp.certificate_store.MergeCallback;
 import pgp.certificate_store.exception.BadDataException;
 import picocli.CommandLine;
 
@@ -24,7 +24,6 @@ import java.io.IOException;
 public class Import implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Import.class);
-    private final MergeCallback mergeCallback = new DefaultMergeCallback();
 
     @Override
     public void run() {
@@ -33,7 +32,7 @@ public class Import implements Runnable {
             for (PGPPublicKeyRing cert : certificates) {
                 ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
                 Certificate certificate = PGPCertDCli.getCertificateDirectory()
-                        .insertCertificate(certIn, mergeCallback);
+                        .insertCertificate(certIn, MergeCallbacks.mergeCertificates());
             }
         } catch (IOException e) {
             LOGGER.error("IO-Error.", e);

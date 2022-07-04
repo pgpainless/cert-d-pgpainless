@@ -33,6 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.KeyFlag;
 import org.pgpainless.certificate_store.CertificateReader;
+import org.pgpainless.certificate_store.KeyReader;
 import org.pgpainless.key.OpenPgpFingerprint;
 import org.pgpainless.key.generation.KeySpec;
 import org.pgpainless.key.generation.type.KeyType;
@@ -41,15 +42,15 @@ import pgp.cert_d.CachingSharedPGPCertificateDirectoryWrapper;
 import pgp.cert_d.FileLockingMechanism;
 import pgp.cert_d.SharedPGPCertificateDirectory;
 import pgp.cert_d.SharedPGPCertificateDirectoryImpl;
+import pgp.certificate_store.CertificateMerger;
 import pgp.certificate_store.exception.BadDataException;
 import pgp.certificate_store.exception.BadNameException;
 import pgp.certificate_store.exception.NotAStoreException;
 import pgp.certificate_store.Certificate;
-import pgp.certificate_store.MergeCallback;
 
 public class SharedPGPCertificateDirectoryTest {
 
-    private static MergeCallback dummyMerge = new MergeCallback() {
+    private static CertificateMerger dummyMerge = new CertificateMerger() {
         @Override
         public Certificate merge(Certificate data, Certificate existing) {
             return data;
@@ -58,9 +59,9 @@ public class SharedPGPCertificateDirectoryTest {
 
     private static Stream<SharedPGPCertificateDirectory> provideTestSubjects() throws IOException, NotAStoreException {
         return Stream.of(
-                new SharedPGPCertificateDirectoryImpl(tempDir(), new CertificateReader()),
+                new SharedPGPCertificateDirectoryImpl(tempDir(), new CertificateReader(), new KeyReader()),
                 new CachingSharedPGPCertificateDirectoryWrapper(
-                        new SharedPGPCertificateDirectoryImpl(tempDir(), new CertificateReader()))
+                        new SharedPGPCertificateDirectoryImpl(tempDir(), new CertificateReader(), new KeyReader()))
         );
     }
 

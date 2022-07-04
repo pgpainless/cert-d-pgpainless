@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2022 Paul Schaub <vanitasvitae@fsfe.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
 # Shared PGP Certificate Directory for Java
 
 This repository contains implementations of the [Shared PGP Certificate Directory](https://sequoia-pgp.gitlab.io/pgp-cert-d/) specification using [PGPainless](https://pgpainless.org) as backend.
