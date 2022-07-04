@@ -14,11 +14,11 @@ import picocli.CommandLine;
 
 import java.io.IOException;
 
-@CommandLine.Command(name = "import",
-        description = "Import or update a certificate")
-public class Import implements Runnable {
+@CommandLine.Command(name = "insert",
+        description = "Insert or update a certificate")
+public class Insert implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Import.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Insert.class);
     private final MergeCallback mergeCallback = new DefaultMergeCallback();
 
     @Override
