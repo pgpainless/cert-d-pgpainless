@@ -19,12 +19,12 @@ import picocli.CommandLine;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-@CommandLine.Command(name = "multi-import",
-        description = "Import or update multiple certificates")
-public class MultiImport implements Runnable {
+@CommandLine.Command(name = "import",
+        description = "Import certificates into the store from stdin")
+public class Import implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiImport.class);
-    private final MergeCallback dummyMerge = new DefaultMergeCallback();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Import.class);
+    private final MergeCallback mergeCallback = new DefaultMergeCallback();
 
     @Override
     public void run() {
@@ -33,7 +33,7 @@ public class MultiImport implements Runnable {
             for (PGPPublicKeyRing cert : certificates) {
                 ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
                 Certificate certificate = PGPCertDCli.getCertificateDirectory()
-                        .insertCertificate(certIn, dummyMerge);
+                        .insertCertificate(certIn, mergeCallback);
             }
         } catch (IOException e) {
             LOGGER.error("IO-Error.", e);

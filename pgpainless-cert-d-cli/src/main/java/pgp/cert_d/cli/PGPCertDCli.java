@@ -10,7 +10,7 @@ import pgp.cert_d.BaseDirectoryProvider;
 import pgp.cert_d.SharedPGPCertificateDirectoryImpl;
 import pgp.cert_d.cli.commands.Get;
 import pgp.cert_d.cli.commands.Insert;
-import pgp.cert_d.cli.commands.MultiImport;
+import pgp.cert_d.cli.commands.Import;
 import pgp.cert_d.jdbc.sqlite.DatabaseSubkeyLookup;
 import pgp.cert_d.jdbc.sqlite.SqliteSubkeyLookupDaoImpl;
 import pgp.certificate_store.SubkeyLookup;
@@ -26,7 +26,7 @@ import java.sql.SQLException;
         description = "Store and manage public OpenPGP certificates",
         subcommands = {
                 Insert.class,
-                MultiImport.class,
+                Import.class,
                 Get.class,
         }
 )
