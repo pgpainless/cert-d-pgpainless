@@ -49,7 +49,7 @@ public class SharedPGPCertificateDirectoryAdapter
             return directory.getBySpecialName(specialName);
         }
 
-        return directory.getByFingerprint(identifier);
+        return directory.getByFingerprint(identifier.toLowerCase());
 
     }
 
@@ -61,7 +61,7 @@ public class SharedPGPCertificateDirectoryAdapter
             return directory.getBySpecialNameIfChanged(specialName, tag);
         }
 
-        return directory.getByFingerprintIfChanged(identifier, tag);
+        return directory.getByFingerprintIfChanged(identifier.toLowerCase(), tag);
 
     }
 
