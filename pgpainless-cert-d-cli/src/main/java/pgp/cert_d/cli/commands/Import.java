@@ -20,7 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @CommandLine.Command(name = "import",
-        description = "Import certificates into the store from stdin")
+        description = "Import certificates into the store from Standard Input")
 public class Import implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Import.class);

@@ -8,6 +8,7 @@ import org.pgpainless.certificate_store.CertificateReader;
 import org.pgpainless.certificate_store.SharedPGPCertificateDirectoryAdapter;
 import pgp.cert_d.BaseDirectoryProvider;
 import pgp.cert_d.SharedPGPCertificateDirectoryImpl;
+import pgp.cert_d.cli.commands.Export;
 import pgp.cert_d.cli.commands.Get;
 import pgp.cert_d.cli.commands.Insert;
 import pgp.cert_d.cli.commands.Import;
@@ -25,6 +26,7 @@ import java.sql.SQLException;
         name = "certificate-store",
         description = "Store and manage public OpenPGP certificates",
         subcommands = {
+                Export.class,
                 Insert.class,
                 Import.class,
                 Get.class,
