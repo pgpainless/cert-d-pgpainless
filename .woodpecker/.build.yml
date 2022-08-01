@@ -1,0 +1,12 @@
+pipeline:
+  run:
+    image: gradle:7.5-jdk8
+    commands:
+      - git checkout $CI_COMMIT_BRANCH
+      # Code works
+      - gradle test
+      # Code is clean
+      - gradle check javadocAll
+      # Code has coverage
+      - gradle jacocoRootReport coveralls
+    secrets: [COVERALLS_REPO_TOKEN]
