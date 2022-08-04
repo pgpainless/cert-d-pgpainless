@@ -16,15 +16,14 @@ import pgp.certificate_store.exception.BadNameException;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "get",
-        description = "Retrieve certificates from the store")
+        resourceBundle = "msg_get")
 public class Get implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Get.class);
 
     @CommandLine.Parameters(
             paramLabel = "IDENTIFIER",
-            arity = "1",
-            description = "Certificate identifier (fingerprint or special name)"
+            arity = "1"
     )
     String identifer;
 

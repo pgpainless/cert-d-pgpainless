@@ -27,7 +27,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 
 @CommandLine.Command(name = "setup",
-        description = "Setup a new certificate directory")
+        resourceBundle = "msg_setup")
 public class Setup implements Runnable {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(Setup.class);
@@ -37,8 +37,7 @@ public class Setup implements Runnable {
 
     static class Exclusive {
         @CommandLine.Option(names = "--with-password",
-                paramLabel = "PASSWORD",
-                description = "Ask for a password for the trust-root key")
+                paramLabel = "PASSWORD")
         String password;
 
         @CommandLine.Option(names = "--import-from-stdin",

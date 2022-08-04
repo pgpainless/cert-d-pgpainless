@@ -26,7 +26,7 @@ import java.sql.SQLException;
 
 @CommandLine.Command(
         name = "certificate-store",
-        description = "Store and manage public OpenPGP certificates",
+        resourceBundle = "msg_pgp-cert-d",
         subcommands = {
                 CommandLine.HelpCommand.class,
                 Export.class,
@@ -39,7 +39,6 @@ import java.sql.SQLException;
 public class PGPCertDCli {
 
     @CommandLine.Option(names = {"-s", "--store"}, paramLabel = "DIRECTORY",
-            description = "Overwrite the default certificate directory path",
             scope = CommandLine.ScopeType.INHERIT)
     File baseDirectory;
 

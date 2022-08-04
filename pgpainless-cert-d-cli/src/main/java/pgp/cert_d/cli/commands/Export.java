@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.Iterator;
 
 @CommandLine.Command(name = "export",
-        description = "Export all certificates in the store to Standard Output")
+        resourceBundle = "msg_export")
 public class Export implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Get.class);

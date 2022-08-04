@@ -15,7 +15,7 @@ import picocli.CommandLine;
 import java.io.IOException;
 
 @CommandLine.Command(name = "insert",
-        description = "Insert or update a certificate")
+        resourceBundle = "msg_insert")
 public class Insert implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Insert.class);
