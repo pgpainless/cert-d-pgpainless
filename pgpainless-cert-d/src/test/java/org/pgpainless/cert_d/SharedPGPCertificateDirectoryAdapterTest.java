@@ -26,7 +26,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.Streams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pgpainless.certificate_store.CertificateReader;
 import org.pgpainless.certificate_store.KeyReader;
 import org.pgpainless.certificate_store.SharedPGPCertificateDirectoryAdapter;
 import pgp.cert_d.InMemorySubkeyLookup;
@@ -51,7 +50,7 @@ public class SharedPGPCertificateDirectoryAdapterTest {
     @BeforeEach
     public void setupInstance() throws IOException, NotAStoreException {
         adapter = new SharedPGPCertificateDirectoryAdapter(
-                new SharedPGPCertificateDirectoryImpl(tempDir(), new CertificateReader(), new KeyReader()),
+                new SharedPGPCertificateDirectoryImpl(tempDir(), new KeyReader()),
                 new InMemorySubkeyLookup());
         store = adapter;
     }

@@ -23,6 +23,11 @@ public class KeyFactory {
 
         return new Key() {
             @Override
+            public String getFingerprint() {
+                return getCertificate().getFingerprint();
+            }
+
+            @Override
             public Certificate getCertificate() {
                 PGPPublicKeyRing publicKeys = PGPainless.extractCertificate(secretKeyRing);
                 return CertificateFactory.certificateFromPublicKeyRing(publicKeys);

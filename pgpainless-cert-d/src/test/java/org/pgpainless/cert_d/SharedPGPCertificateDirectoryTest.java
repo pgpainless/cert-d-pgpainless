@@ -32,7 +32,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.KeyFlag;
-import org.pgpainless.certificate_store.CertificateReader;
 import org.pgpainless.certificate_store.KeyReader;
 import org.pgpainless.key.OpenPgpFingerprint;
 import org.pgpainless.key.generation.KeySpec;
@@ -59,9 +58,9 @@ public class SharedPGPCertificateDirectoryTest {
 
     private static Stream<SharedPGPCertificateDirectory> provideTestSubjects() throws IOException, NotAStoreException {
         return Stream.of(
-                new SharedPGPCertificateDirectoryImpl(tempDir(), new CertificateReader(), new KeyReader()),
+                new SharedPGPCertificateDirectoryImpl(tempDir(), new KeyReader()),
                 new CachingSharedPGPCertificateDirectoryWrapper(
-                        new SharedPGPCertificateDirectoryImpl(tempDir(), new CertificateReader(), new KeyReader()))
+                        new SharedPGPCertificateDirectoryImpl(tempDir(), new KeyReader()))
         );
     }
 
@@ -76,7 +75,7 @@ public class SharedPGPCertificateDirectoryTest {
     public void simpleInsertGet(SharedPGPCertificateDirectory directory)
             throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
             BadDataException, InterruptedException, BadNameException {
-        PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice", null);
+        PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice");
         PGPPublicKeyRing cert = PGPainless.extractCertificate(key);
         OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(cert);
         ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
@@ -133,7 +132,7 @@ public class SharedPGPCertificateDirectoryTest {
             BadDataException, InterruptedException {
         assumeTrue(directory.getLock() instanceof FileLockingMechanism);
 
-        PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice", null);
+        PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice");
         PGPPublicKeyRing cert = PGPainless.extractCertificate(key);
         ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
 
@@ -150,7 +149,7 @@ public class SharedPGPCertificateDirectoryTest {
             throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
             BadDataException, InterruptedException, BadNameException {
 
-        PGPSecretKeyRing trustRootKey = PGPainless.generateKeyRing().modernKeyRing("Alice", null);
+        PGPSecretKeyRing trustRootKey = PGPainless.generateKeyRing().modernKeyRing("Alice");
         PGPPublicKeyRing trustRootCert = PGPainless.extractCertificate(trustRootKey);
         OpenPgpFingerprint trustRootFingerprint = OpenPgpFingerprint.of(trustRootCert);
         ByteArrayInputStream trustRootCertIn = new ByteArrayInputStream(trustRootCert.getEncoded());
@@ -159,7 +158,7 @@ public class SharedPGPCertificateDirectoryTest {
         final int certificateCount = 3;
         Map<String, PGPPublicKeyRing> certificateMap = new HashMap<>();
         for (int i = 0; i < certificateCount; i++) {
-            PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice", null);
+            PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice");
             PGPPublicKeyRing cert = PGPainless.extractCertificate(key);
             OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(cert);
             certificateMap.put(fingerprint.toString().toLowerCase(), cert);

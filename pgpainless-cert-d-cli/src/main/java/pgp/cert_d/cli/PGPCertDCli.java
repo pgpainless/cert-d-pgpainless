@@ -4,7 +4,6 @@
 
 package pgp.cert_d.cli;
 
-import org.pgpainless.certificate_store.CertificateReader;
 import org.pgpainless.certificate_store.KeyReader;
 import org.pgpainless.certificate_store.SharedPGPCertificateDirectoryAdapter;
 import pgp.cert_d.BaseDirectoryProvider;
@@ -62,7 +61,6 @@ public class PGPCertDCli {
 
         certificateDirectory = new SharedPGPCertificateDirectoryImpl(
                 baseDirectory,
-                new CertificateReader(),
                 new KeyReader());
         subkeyLookup = new DatabaseSubkeyLookup(
                 SqliteSubkeyLookupDaoImpl.forDatabaseFile(new File(baseDirectory, "_pgpainless_subkey_map.db")));

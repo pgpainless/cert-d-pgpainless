@@ -12,7 +12,7 @@ allprojects {
         logbackVersion = '1.2.11'
         junitVersion = '5.8.2'
         mockitoVersion = '4.5.1'
-        pgpainlessVersion = '1.2.1'
+        pgpainlessVersion = '1.3.5-SNAPSHOT'
         pgpCertDJavaVersion = '0.1.2-SNAPSHOT'
         picocliVersion = '4.6.3'
     }
