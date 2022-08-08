@@ -12,6 +12,7 @@ import pgp.cert_d.cli.commands.Export;
 import pgp.cert_d.cli.commands.Get;
 import pgp.cert_d.cli.commands.Insert;
 import pgp.cert_d.cli.commands.Import;
+import pgp.cert_d.cli.commands.List;
 import pgp.cert_d.cli.commands.Setup;
 import pgp.cert_d.jdbc.sqlite.DatabaseSubkeyLookup;
 import pgp.cert_d.jdbc.sqlite.SqliteSubkeyLookupDaoImpl;
@@ -32,7 +33,8 @@ import java.sql.SQLException;
                 Insert.class,
                 Import.class,
                 Get.class,
-                Setup.class
+                Setup.class,
+                List.class
         }
 )
 public class PGPCertDCli {
