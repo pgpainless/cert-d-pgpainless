@@ -4,16 +4,17 @@
 
 package pgp.cert_d.cli.commands;
 
-import java.io.IOException;
-
 import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pgp.cert_d.BadDataException;
 import pgp.cert_d.BadNameException;
+import pgp.cert_d.SpecialNames;
 import pgp.cert_d.cli.PGPCertDCli;
-import pgp.certificate.Certificate;
+import pgp.certificate.KeyMaterial;
 import picocli.CommandLine;
+
+import java.io.IOException;
 
 @CommandLine.Command(name = "get",
         resourceBundle = "msg_get")
@@ -30,12 +31,16 @@ public class Get implements Runnable {
     @Override
     public void run() {
         try {
-            Certificate certificate = PGPCertDCli.getCertificateDirectory()
-                    .getByFingerprint(identifer);
-            if (certificate == null) {
+            KeyMaterial record;
+            if (SpecialNames.lookupSpecialName(identifer) != null) {
+                record = PGPCertDCli.getCertificateDirectory().getBySpecialName(identifer);
+            } else {
+                record = PGPCertDCli.getCertificateDirectory().getByFingerprint(identifer);
+            }
+            if (record == null) {
                 return;
             }
-            Streams.pipeAll(certificate.getInputStream(), System.out);
+            Streams.pipeAll(record.getInputStream(), System.out);
         } catch (IOException e) {
             LOGGER.error("IO Error", e);
             System.exit(-1);
