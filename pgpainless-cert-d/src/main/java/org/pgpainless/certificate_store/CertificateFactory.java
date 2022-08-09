@@ -8,7 +8,7 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.util.encoders.Base64;
 import org.pgpainless.key.OpenPgpFingerprint;
-import pgp.certificate_store.Certificate;
+import pgp.certificate.Certificate;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

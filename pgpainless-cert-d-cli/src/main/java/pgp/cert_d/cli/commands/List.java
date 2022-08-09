@@ -5,7 +5,7 @@
 package pgp.cert_d.cli.commands;
 
 import pgp.cert_d.cli.PGPCertDCli;
-import pgp.certificate_store.Certificate;
+import pgp.certificate.Certificate;
 import picocli.CommandLine;
 
 import java.util.Iterator;
@@ -18,7 +18,7 @@ public class List implements Runnable {
     @Override
     public void run() {
         Iterator<Certificate> certificates = PGPCertDCli.getCertificateDirectory()
-                .getCertificates();
+                .items();
         while (certificates.hasNext()) {
             Certificate certificate = certificates.next();
             // CHECKSTYLE:OFF

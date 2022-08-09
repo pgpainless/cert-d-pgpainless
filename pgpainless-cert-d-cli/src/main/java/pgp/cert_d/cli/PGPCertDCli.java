@@ -4,21 +4,15 @@
 
 package pgp.cert_d.cli;
 
-import org.pgpainless.certificate_store.KeyReader;
-import org.pgpainless.certificate_store.SharedPGPCertificateDirectoryAdapter;
+import org.pgpainless.certificate_store.PGPainlessCertD;
 import pgp.cert_d.BaseDirectoryProvider;
-import pgp.cert_d.SharedPGPCertificateDirectoryImpl;
+import pgp.cert_d.NotAStoreException;
 import pgp.cert_d.cli.commands.Export;
 import pgp.cert_d.cli.commands.Get;
 import pgp.cert_d.cli.commands.Insert;
 import pgp.cert_d.cli.commands.Import;
 import pgp.cert_d.cli.commands.List;
 import pgp.cert_d.cli.commands.Setup;
-import pgp.cert_d.jdbc.sqlite.DatabaseSubkeyLookup;
-import pgp.cert_d.jdbc.sqlite.SqliteSubkeyLookupDaoImpl;
-import pgp.certificate_store.SubkeyLookup;
-import pgp.certificate_store.exception.NotAStoreException;
-import pgp.certificate_store.CertificateDirectory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -43,7 +37,7 @@ public class PGPCertDCli {
             scope = CommandLine.ScopeType.INHERIT)
     File baseDirectory;
 
-    private static CertificateDirectory certificateDirectory;
+    private static PGPainlessCertD certificateDirectory;
 
     private int executionStrategy(CommandLine.ParseResult parseResult) {
         try {
@@ -55,19 +49,11 @@ public class PGPCertDCli {
     }
 
     private void initStore() throws NotAStoreException, SQLException {
-        SharedPGPCertificateDirectoryImpl certificateDirectory;
-        SubkeyLookup subkeyLookup;
         if (baseDirectory == null) {
             baseDirectory = BaseDirectoryProvider.getDefaultBaseDir();
         }
 
-        certificateDirectory = new SharedPGPCertificateDirectoryImpl(
-                baseDirectory,
-                new KeyReader());
-        subkeyLookup = new DatabaseSubkeyLookup(
-                SqliteSubkeyLookupDaoImpl.forDatabaseFile(new File(baseDirectory, "_pgpainless_subkey_map.db")));
-
-        PGPCertDCli.certificateDirectory = new SharedPGPCertificateDirectoryAdapter(certificateDirectory, subkeyLookup);
+        PGPCertDCli.certificateDirectory = PGPainlessCertD.fileBased(baseDirectory);
     }
 
     public static void main(String[] args) {
@@ -77,7 +63,7 @@ public class PGPCertDCli {
                 .execute(args);
     }
 
-    public static CertificateDirectory getCertificateDirectory() {
+    public static PGPainlessCertD getCertificateDirectory() {
         return certificateDirectory;
     }
 }

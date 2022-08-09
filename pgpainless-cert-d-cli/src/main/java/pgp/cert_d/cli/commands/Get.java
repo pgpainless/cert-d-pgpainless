@@ -9,10 +9,10 @@ import java.io.IOException;
 import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pgp.cert_d.BadDataException;
+import pgp.cert_d.BadNameException;
 import pgp.cert_d.cli.PGPCertDCli;
-import pgp.certificate_store.Certificate;
-import pgp.certificate_store.exception.BadDataException;
-import pgp.certificate_store.exception.BadNameException;
+import pgp.certificate.Certificate;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "get",
@@ -31,7 +31,7 @@ public class Get implements Runnable {
     public void run() {
         try {
             Certificate certificate = PGPCertDCli.getCertificateDirectory()
-                    .getCertificate(identifer);
+                    .getByFingerprint(identifer);
             if (certificate == null) {
                 return;
             }

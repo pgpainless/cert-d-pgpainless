@@ -10,10 +10,8 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.pgpainless.PGPainless;
 import org.pgpainless.certificate_store.CertificateFactory;
 import org.pgpainless.key.OpenPgpFingerprint;
-import pgp.certificate_store.Certificate;
-import pgp.certificate_store.CertificateMerger;
-import pgp.certificate_store.Key;
-import pgp.certificate_store.KeyMerger;
+import pgp.certificate.KeyMaterial;
+import pgp.certificate.KeyMaterialMerger;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -21,16 +19,16 @@ import java.util.Iterator;
 public class MergeCallbacks {
 
     /**
-     * Return a {@link CertificateMerger} that merges the two copies of the same certificate (same primary key) into one
+     * Return a {@link KeyMaterialMerger} that merges the two copies of the same certificate (same primary key) into one
      * combined certificate.
      *
      * @return merging callback
      */
-    public static CertificateMerger mergeCertificates() {
-        return new CertificateMerger() {
+    public static KeyMaterialMerger mergeCertificates() {
+        return new KeyMaterialMerger() {
 
             @Override
-            public Certificate merge(Certificate data, Certificate existing) throws IOException {
+            public KeyMaterial merge(KeyMaterial data, KeyMaterial existing) throws IOException {
                 try {
                     PGPPublicKeyRing existingCert = PGPainless.readKeyRing().publicKeyRing(existing.getInputStream());
                     PGPPublicKeyRing updatedCert = PGPainless.readKeyRing().publicKeyRing(data.getInputStream());
@@ -97,26 +95,26 @@ public class MergeCallbacks {
     }
 
     /**
-     * Return an implementation of {@link CertificateMerger} that ignores the existing certificate and instead
+     * Return an implementation of {@link KeyMaterialMerger} that ignores the existing certificate and instead
      * returns the first instance.
      *
      * @return overriding callback
      */
-    public static CertificateMerger overrideCertificate() {
+    public static KeyMaterialMerger overrideCertificate() {
         // noinspection Convert2Lambda
-        return new CertificateMerger() {
+        return new KeyMaterialMerger() {
             @Override
-            public Certificate merge(Certificate data, Certificate existing) {
+            public KeyMaterial merge(KeyMaterial data, KeyMaterial existing) {
                 return data;
             }
         };
     }
 
-    public static KeyMerger overrideKey() {
+    public static KeyMaterialMerger overrideKey() {
         // noinspection Convert2Lambda
-        return new KeyMerger() {
+        return new KeyMaterialMerger() {
             @Override
-            public Key merge(Key data, Key existing) {
+            public KeyMaterial merge(KeyMaterial data, KeyMaterial existing) {
                 return data;
             }
         };
