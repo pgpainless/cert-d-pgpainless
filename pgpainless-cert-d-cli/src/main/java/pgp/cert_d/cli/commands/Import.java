@@ -10,7 +10,7 @@ import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.pgpainless.PGPainless;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pgp.cert_d.BadDataException;
+import pgp.cert_d.exception.BadDataException;
 import pgp.cert_d.cli.MergeCallbacks;
 import pgp.cert_d.cli.PGPCertDCli;
 import pgp.certificate.Certificate;

@@ -5,9 +5,9 @@
 package org.pgpainless.certificate_store;
 
 import pgp.cert_d.BaseDirectoryProvider;
-import pgp.cert_d.FileBasedCertificateDirectoryBackend;
-import pgp.cert_d.InMemoryCertificateDirectoryBackend;
-import pgp.cert_d.NotAStoreException;
+import pgp.cert_d.backend.FileBasedCertificateDirectoryBackend;
+import pgp.cert_d.backend.InMemoryCertificateDirectoryBackend;
+import pgp.cert_d.exception.NotAStoreException;
 import pgp.cert_d.PGPCertificateDirectory;
 
 import java.io.File;

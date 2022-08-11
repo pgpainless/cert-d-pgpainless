@@ -6,7 +6,7 @@ package pgp.cert_d.cli;
 
 import org.pgpainless.certificate_store.PGPainlessCertD;
 import pgp.cert_d.BaseDirectoryProvider;
-import pgp.cert_d.NotAStoreException;
+import pgp.cert_d.exception.NotAStoreException;
 import pgp.cert_d.cli.commands.Export;
 import pgp.cert_d.cli.commands.Get;
 import pgp.cert_d.cli.commands.Insert;
