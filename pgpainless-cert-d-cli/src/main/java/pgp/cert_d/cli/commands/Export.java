@@ -9,7 +9,7 @@ import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pgp.cert_d.cli.PGPCertDCli;
-import pgp.certificate.Certificate;
+import pgp.certificate_store.certificate.Certificate;
 import picocli.CommandLine;
 
 import java.io.IOException;

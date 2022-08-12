@@ -5,7 +5,7 @@
 package pgp.cert_d.cli.commands;
 
 import pgp.cert_d.cli.PGPCertDCli;
-import pgp.certificate.Certificate;
+import pgp.certificate_store.certificate.Certificate;
 import picocli.CommandLine;
 
 import java.util.Iterator;

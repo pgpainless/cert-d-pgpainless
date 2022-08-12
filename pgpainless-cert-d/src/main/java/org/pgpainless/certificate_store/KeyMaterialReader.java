@@ -8,9 +8,9 @@ import org.bouncycastle.openpgp.PGPKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.pgpainless.PGPainless;
-import pgp.cert_d.exception.BadDataException;
-import pgp.certificate.KeyMaterial;
-import pgp.certificate.KeyMaterialReaderBackend;
+import pgp.certificate_store.certificate.KeyMaterial;
+import pgp.certificate_store.certificate.KeyMaterialReaderBackend;
+import pgp.certificate_store.exception.BadDataException;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -8,15 +8,15 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.util.encoders.Base64;
 import org.pgpainless.PGPainless;
-import pgp.certificate.Certificate;
-import pgp.certificate.Key;
+import pgp.certificate_store.certificate.Certificate;
+import pgp.certificate_store.certificate.Key;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Set;
+import java.util.List;
 
 public class KeyFactory {
 
@@ -52,7 +52,7 @@ public class KeyFactory {
             }
 
             @Override
-            public Set<Long> getSubkeyIds() throws IOException {
+            public List<Long> getSubkeyIds() throws IOException {
                 return getCertificate().getSubkeyIds();
             }
         };

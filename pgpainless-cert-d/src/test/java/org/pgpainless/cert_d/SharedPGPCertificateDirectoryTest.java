@@ -36,12 +36,13 @@ import org.pgpainless.key.OpenPgpFingerprint;
 import org.pgpainless.key.generation.KeySpec;
 import org.pgpainless.key.generation.type.KeyType;
 import org.pgpainless.key.generation.type.eddsa.EdDSACurve;
-import pgp.cert_d.exception.BadDataException;
-import pgp.cert_d.exception.BadNameException;
-import pgp.cert_d.exception.NotAStoreException;
-import pgp.certificate.Certificate;
-import pgp.certificate.KeyMaterial;
-import pgp.certificate.KeyMaterialMerger;
+import pgp.cert_d.subkey_lookup.InMemorySubkeyLookupFactory;
+import pgp.certificate_store.certificate.Certificate;
+import pgp.certificate_store.certificate.KeyMaterial;
+import pgp.certificate_store.certificate.KeyMaterialMerger;
+import pgp.certificate_store.exception.BadDataException;
+import pgp.certificate_store.exception.BadNameException;
+import pgp.certificate_store.exception.NotAStoreException;
 
 public class SharedPGPCertificateDirectoryTest {
 
@@ -54,7 +55,7 @@ public class SharedPGPCertificateDirectoryTest {
 
     private static Stream<PGPainlessCertD> provideTestSubjects() throws IOException, NotAStoreException {
         return Stream.of(
-                PGPainlessCertD.fileBased(tempDir()));
+                PGPainlessCertD.fileBased(tempDir(), new InMemorySubkeyLookupFactory()));
     }
 
     private static File tempDir() throws IOException {

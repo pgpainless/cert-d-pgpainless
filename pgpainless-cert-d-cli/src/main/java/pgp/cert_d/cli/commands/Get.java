@@ -4,14 +4,15 @@
 
 package pgp.cert_d.cli.commands;
 
+import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pgp.cert_d.exception.BadDataException;
-import pgp.cert_d.exception.BadNameException;
 import pgp.cert_d.SpecialNames;
 import pgp.cert_d.cli.PGPCertDCli;
-import pgp.certificate.KeyMaterial;
+import pgp.certificate_store.certificate.KeyMaterial;
+import pgp.certificate_store.exception.BadDataException;
+import pgp.certificate_store.exception.BadNameException;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -21,6 +22,9 @@ import java.io.IOException;
 public class Get implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Get.class);
+
+    @CommandLine.Option(names = {"-a", "--armor"})
+    boolean armor = false;
 
     @CommandLine.Parameters(
             paramLabel = "IDENTIFIER",
@@ -35,12 +39,20 @@ public class Get implements Runnable {
             if (SpecialNames.lookupSpecialName(identifer) != null) {
                 record = PGPCertDCli.getCertificateDirectory().getBySpecialName(identifer);
             } else {
-                record = PGPCertDCli.getCertificateDirectory().getByFingerprint(identifer);
+                record = PGPCertDCli.getCertificateDirectory().getByFingerprint(identifer.toLowerCase());
             }
             if (record == null) {
                 return;
             }
-            Streams.pipeAll(record.getInputStream(), System.out);
+
+            if (armor) {
+                ArmoredOutputStream armorOut = new ArmoredOutputStream(System.out);
+                Streams.pipeAll(record.getInputStream(), armorOut);
+                armorOut.close();
+            } else {
+                Streams.pipeAll(record.getInputStream(), System.out);
+            }
+
         } catch (IOException e) {
             LOGGER.error("IO Error", e);
             System.exit(-1);

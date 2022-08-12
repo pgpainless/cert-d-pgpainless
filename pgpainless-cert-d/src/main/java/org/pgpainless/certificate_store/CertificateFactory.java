@@ -8,16 +8,16 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.util.encoders.Base64;
 import org.pgpainless.key.OpenPgpFingerprint;
-import pgp.certificate.Certificate;
+import pgp.certificate_store.certificate.Certificate;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 public class CertificateFactory {
 
@@ -46,8 +46,8 @@ public class CertificateFactory {
             }
 
             @Override
-            public Set<Long> getSubkeyIds() throws IOException {
-                Set<Long> keyIds = new HashSet<>();
+            public List<Long> getSubkeyIds() throws IOException {
+                List<Long> keyIds = new ArrayList<>();
                 Iterator<PGPPublicKey> keys = publicKeyRing.getPublicKeys();
                 while (keys.hasNext()) {
                     keyIds.add(keys.next().getKeyID());

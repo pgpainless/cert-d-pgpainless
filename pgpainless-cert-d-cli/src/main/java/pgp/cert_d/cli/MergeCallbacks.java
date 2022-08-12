@@ -10,8 +10,8 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.pgpainless.PGPainless;
 import org.pgpainless.certificate_store.CertificateFactory;
 import org.pgpainless.key.OpenPgpFingerprint;
-import pgp.certificate.KeyMaterial;
-import pgp.certificate.KeyMaterialMerger;
+import pgp.certificate_store.certificate.KeyMaterial;
+import pgp.certificate_store.certificate.KeyMaterialMerger;
 
 import java.io.IOException;
 import java.util.Iterator;
