@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,36 +31,31 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.KeyFlag;
-import org.pgpainless.certificate_store.KeyReader;
+import org.pgpainless.certificate_store.PGPainlessCertD;
 import org.pgpainless.key.OpenPgpFingerprint;
 import org.pgpainless.key.generation.KeySpec;
 import org.pgpainless.key.generation.type.KeyType;
 import org.pgpainless.key.generation.type.eddsa.EdDSACurve;
-import pgp.cert_d.CachingSharedPGPCertificateDirectoryWrapper;
-import pgp.cert_d.FileLockingMechanism;
-import pgp.cert_d.SharedPGPCertificateDirectory;
-import pgp.cert_d.SharedPGPCertificateDirectoryImpl;
-import pgp.certificate_store.CertificateMerger;
+import pgp.cert_d.subkey_lookup.InMemorySubkeyLookupFactory;
+import pgp.certificate_store.certificate.Certificate;
+import pgp.certificate_store.certificate.KeyMaterial;
+import pgp.certificate_store.certificate.KeyMaterialMerger;
 import pgp.certificate_store.exception.BadDataException;
 import pgp.certificate_store.exception.BadNameException;
 import pgp.certificate_store.exception.NotAStoreException;
-import pgp.certificate_store.Certificate;
 
 public class SharedPGPCertificateDirectoryTest {
 
-    private static CertificateMerger dummyMerge = new CertificateMerger() {
+    private static KeyMaterialMerger dummyMerge = new KeyMaterialMerger() {
         @Override
-        public Certificate merge(Certificate data, Certificate existing) {
+        public KeyMaterial merge(KeyMaterial data, KeyMaterial existing) {
             return data;
         }
     };
 
-    private static Stream<SharedPGPCertificateDirectory> provideTestSubjects() throws IOException, NotAStoreException {
+    private static Stream<PGPainlessCertD> provideTestSubjects() throws IOException, NotAStoreException {
         return Stream.of(
-                new SharedPGPCertificateDirectoryImpl(tempDir(), new KeyReader()),
-                new CachingSharedPGPCertificateDirectoryWrapper(
-                        new SharedPGPCertificateDirectoryImpl(tempDir(), new KeyReader()))
-        );
+                PGPainlessCertD.fileBased(tempDir(), new InMemorySubkeyLookupFactory()));
     }
 
     private static File tempDir() throws IOException {
@@ -72,7 +66,7 @@ public class SharedPGPCertificateDirectoryTest {
 
     @ParameterizedTest
     @MethodSource("provideTestSubjects")
-    public void simpleInsertGet(SharedPGPCertificateDirectory directory)
+    public void simpleInsertGet(PGPainlessCertD directory)
             throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
             BadDataException, InterruptedException, BadNameException {
         PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice");
@@ -87,10 +81,6 @@ public class SharedPGPCertificateDirectoryTest {
         Certificate certificate = directory.insert(certIn, dummyMerge);
         assertEquals(fingerprint.toString().toLowerCase(), certificate.getFingerprint());
 
-        // getIfChanged
-        assertNull(directory.getByFingerprintIfChanged(certificate.getFingerprint(), certificate.getTag()));
-        assertNotNull(directory.getByFingerprintIfChanged(certificate.getFingerprint(), "invalidTag"));
-
         // tryInsert
         certIn = new ByteArrayInputStream(cert.getEncoded());
         assertNotNull(directory.tryInsert(certIn, dummyMerge));
@@ -98,7 +88,7 @@ public class SharedPGPCertificateDirectoryTest {
 
     @ParameterizedTest
     @MethodSource("provideTestSubjects")
-    public void simpleInsertGetBySpecialName(SharedPGPCertificateDirectory directory)
+    public void simpleInsertGetBySpecialName(PGPainlessCertD directory)
             throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
             BadDataException, InterruptedException, BadNameException {
         PGPSecretKeyRing key = PGPainless.buildKeyRing()
@@ -116,10 +106,6 @@ public class SharedPGPCertificateDirectoryTest {
         Certificate certificate = directory.insertWithSpecialName("trust-root", certIn, dummyMerge);
         assertEquals(fingerprint.toString().toLowerCase(), certificate.getFingerprint());
 
-        // getIfChanged
-        assertNull(directory.getBySpecialNameIfChanged("trust-root", certificate.getTag()));
-        assertNotNull(directory.getBySpecialNameIfChanged("trust-root", "invalidTag"));
-
         // tryInsert
         certIn = new ByteArrayInputStream(trustRoot.getEncoded());
         assertNotNull(directory.tryInsertWithSpecialName("trust-root", certIn, dummyMerge));
@@ -127,25 +113,7 @@ public class SharedPGPCertificateDirectoryTest {
 
     @ParameterizedTest
     @MethodSource("provideTestSubjects")
-    public void tryInsertFailsWithLockedStore(SharedPGPCertificateDirectory directory)
-            throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
-            BadDataException, InterruptedException {
-        assumeTrue(directory.getLock() instanceof FileLockingMechanism);
-
-        PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice");
-        PGPPublicKeyRing cert = PGPainless.extractCertificate(key);
-        ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
-
-        directory.getLock().lockDirectory();
-        assertNull(directory.tryInsert(certIn, dummyMerge));
-
-        directory.getLock().releaseDirectory();
-        assertNotNull(directory.tryInsert(certIn, dummyMerge));
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideTestSubjects")
-    public void testGetItemsAndFingerprints(SharedPGPCertificateDirectory directory)
+    public void testGetItemsAndFingerprints(PGPainlessCertD directory)
             throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
             BadDataException, InterruptedException, BadNameException {
 
