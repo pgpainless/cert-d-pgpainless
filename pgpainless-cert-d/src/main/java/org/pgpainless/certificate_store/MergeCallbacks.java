@@ -81,9 +81,9 @@ public class MergeCallbacks {
                     printOutDifferences(existingKeyRing, mergedKeyRing);
 
                     if (mergedKeyRing instanceof PGPPublicKeyRing) {
-                        return CertificateFactory.certificateFromPublicKeyRing((PGPPublicKeyRing) mergedKeyRing);
+                        return CertificateFactory.certificateFromPublicKeyRing((PGPPublicKeyRing) mergedKeyRing, null);
                     } else {
-                        return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) mergedKeyRing);
+                        return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) mergedKeyRing, null);
                     }
 
                 } catch (PGPException e) {

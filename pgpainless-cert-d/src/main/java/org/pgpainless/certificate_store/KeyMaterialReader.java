@@ -18,12 +18,12 @@ import java.io.InputStream;
 public class KeyMaterialReader implements KeyMaterialReaderBackend {
 
     @Override
-    public KeyMaterial read(InputStream data) throws IOException, BadDataException {
+    public KeyMaterial read(InputStream data, Long tag) throws IOException, BadDataException {
         PGPKeyRing keyMaterial = PGPainless.readKeyRing().keyRing(data);
         if (keyMaterial instanceof PGPSecretKeyRing) {
-            return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) keyMaterial);
+            return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) keyMaterial, tag);
         } else if (keyMaterial instanceof PGPPublicKeyRing) {
-            return CertificateFactory.certificateFromPublicKeyRing((PGPPublicKeyRing) keyMaterial);
+            return CertificateFactory.certificateFromPublicKeyRing((PGPPublicKeyRing) keyMaterial, tag);
         } else {
             throw new BadDataException();
         }

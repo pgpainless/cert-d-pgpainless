@@ -5,7 +5,10 @@
 package pgp.cert_d.cli.commands;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
+import org.bouncycastle.openpgp.PGPKeyRing;
 import org.bouncycastle.util.io.Streams;
+import org.pgpainless.PGPainless;
+import org.pgpainless.util.ArmorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pgp.cert_d.SpecialNames;
@@ -46,7 +49,8 @@ public class Get implements Runnable {
             }
 
             if (armor) {
-                ArmoredOutputStream armorOut = new ArmoredOutputStream(System.out);
+                PGPKeyRing keyRing = PGPainless.readKeyRing().keyRing(record.getInputStream());
+                ArmoredOutputStream armorOut = ArmorUtils.toAsciiArmoredStream(keyRing, System.out);
                 Streams.pipeAll(record.getInputStream(), armorOut);
                 armorOut.close();
             } else {
