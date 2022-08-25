@@ -40,7 +40,7 @@ public class PGPCertDCli {
             scope = CommandLine.ScopeType.INHERIT)
     File baseDirectory;
 
-    private static PGPainlessCertD certificateDirectory;
+    static PGPainlessCertD certificateDirectory;
 
     private int executionStrategy(CommandLine.ParseResult parseResult) {
         try {
@@ -52,6 +52,10 @@ public class PGPCertDCli {
     }
 
     private void initStore() throws NotAStoreException, SQLException {
+        if (certificateDirectory != null) {
+            return;
+        }
+
         if (baseDirectory == null) {
             baseDirectory = BaseDirectoryProvider.getDefaultBaseDir();
         }
