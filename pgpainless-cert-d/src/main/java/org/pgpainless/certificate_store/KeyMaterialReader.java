@@ -19,7 +19,17 @@ public class KeyMaterialReader implements KeyMaterialReaderBackend {
 
     @Override
     public KeyMaterial read(InputStream data, Long tag) throws IOException, BadDataException {
-        PGPKeyRing keyMaterial = PGPainless.readKeyRing().keyRing(data);
+        PGPKeyRing keyMaterial;
+        try {
+            keyMaterial = PGPainless.readKeyRing().keyRing(data);
+        } catch (IOException e) {
+            if (e.getMessage().contains("unknown object in stream") ||
+                    e.getMessage().contains("unexpected end of file in armored stream.")) {
+                throw new BadDataException();
+            } else {
+                throw e;
+            }
+        }
         if (keyMaterial instanceof PGPSecretKeyRing) {
             return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) keyMaterial, tag);
         } else if (keyMaterial instanceof PGPPublicKeyRing) {
