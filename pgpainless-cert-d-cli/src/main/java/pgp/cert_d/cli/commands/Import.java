@@ -32,7 +32,7 @@ public class Import implements Runnable {
             for (PGPPublicKeyRing cert : certificates) {
                 ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
                 Certificate certificate = PGPCertDCli.getCertificateDirectory()
-                        .insert(certIn, MergeCallbacks.mergeCertificates());
+                        .insert(certIn, MergeCallbacks.mergeWithExisting());
             }
         } catch (IOException e) {
             LOGGER.error("IO-Error.", e);

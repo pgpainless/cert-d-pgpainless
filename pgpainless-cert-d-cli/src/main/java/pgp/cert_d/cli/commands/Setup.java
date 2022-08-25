@@ -61,7 +61,7 @@ public class Setup implements Runnable {
 
         try {
             InputStream inputStream = new ByteArrayInputStream(trustRoot.getEncoded());
-            PGPCertDCli.getCertificateDirectory().insertTrustRoot(inputStream, MergeCallbacks.overrideKey());
+            PGPCertDCli.getCertificateDirectory().insertTrustRoot(inputStream, MergeCallbacks.overrideExisting());
 
         } catch (BadDataException e) {
             throw new RuntimeException(e);

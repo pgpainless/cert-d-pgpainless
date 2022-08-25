@@ -16,7 +16,6 @@ import pgp.certificate_store.certificate.KeyMaterialMerger;
 import pgp.certificate_store.exception.BadDataException;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class MergeCallbacks {
@@ -27,11 +26,13 @@ public class MergeCallbacks {
      *
      * @return merging callback
      */
-    public static KeyMaterialMerger mergeCertificates() {
+    public static KeyMaterialMerger mergeWithExisting() {
         return new KeyMaterialMerger() {
 
             @Override
-            public KeyMaterial merge(KeyMaterial data, KeyMaterial existing) throws IOException {
+            public KeyMaterial merge(KeyMaterial data, KeyMaterial existing)
+                    throws IOException {
+                // Simple cases: one is null -> return other
                 if (data == null) {
                     return existing;
                 }
@@ -46,48 +47,63 @@ public class MergeCallbacks {
                     PGPKeyRing mergedKeyRing;
 
                     if (existingKeyRing instanceof PGPPublicKeyRing) {
-                        PGPPublicKeyRing existingCert = (PGPPublicKeyRing) existingKeyRing;
-                        if (updatedKeyRing instanceof PGPPublicKeyRing) {
-                            mergedKeyRing = PGPPublicKeyRing.join(existingCert, (PGPPublicKeyRing) updatedKeyRing);
-                        } else if (updatedKeyRing instanceof PGPSecretKeyRing) {
-                            PGPPublicKeyRing updatedPublicKeys = PGPainless.extractCertificate((PGPSecretKeyRing) updatedKeyRing);
-                            PGPPublicKeyRing mergedPublicKeys = PGPPublicKeyRing.join(existingCert, updatedPublicKeys);
-                            updatedKeyRing = PGPSecretKeyRing.replacePublicKeys((PGPSecretKeyRing) updatedKeyRing, mergedPublicKeys);
-                            mergedKeyRing = updatedKeyRing;
-                        } else {
-                            throw new IOException(new BadDataException());
-                        }
+                        mergedKeyRing = mergeWithCert((PGPPublicKeyRing) existingKeyRing, updatedKeyRing);
                     } else if (existingKeyRing instanceof PGPSecretKeyRing) {
-                        PGPSecretKeyRing existingKey = (PGPSecretKeyRing) existingKeyRing;
-                        PGPPublicKeyRing existingCert = PGPainless.extractCertificate(existingKey);
-                        if (updatedKeyRing instanceof PGPPublicKeyRing) {
-                            PGPPublicKeyRing updatedCert = (PGPPublicKeyRing) updatedKeyRing;
-                            PGPPublicKeyRing mergedCert = PGPPublicKeyRing.join(existingCert, updatedCert);
-                            mergedKeyRing = PGPSecretKeyRing.replacePublicKeys(existingKey, mergedCert);
-                        } else if (updatedKeyRing instanceof PGPSecretKeyRing) {
-                            PGPSecretKeyRing updatedKey = (PGPSecretKeyRing) updatedKeyRing;
-                            if (!Arrays.equals(existingKey.getEncoded(), updatedKey.getEncoded())) {
-                                // Merging secret keys is not supported.
-                                return existing;
-                            }
-                            mergedKeyRing = existingKeyRing;
-                        } else {
-                            throw new IOException(new BadDataException());
-                        }
+                        mergedKeyRing = mergeWithKey(existingKeyRing, updatedKeyRing);
                     } else {
                         throw new IOException(new BadDataException());
                     }
 
                     printOutDifferences(existingKeyRing, mergedKeyRing);
 
-                    if (mergedKeyRing instanceof PGPPublicKeyRing) {
-                        return CertificateFactory.certificateFromPublicKeyRing((PGPPublicKeyRing) mergedKeyRing, null);
-                    } else {
-                        return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) mergedKeyRing, null);
-                    }
+                    return toKeyMaterial(mergedKeyRing);
 
                 } catch (PGPException e) {
                     throw new RuntimeException(e);
+                }
+            }
+
+            private PGPKeyRing mergeWithCert(PGPPublicKeyRing existingKeyRing, PGPKeyRing updatedKeyRing)
+                    throws PGPException, IOException {
+                PGPKeyRing mergedKeyRing;
+                PGPPublicKeyRing existingCert = existingKeyRing;
+                if (updatedKeyRing instanceof PGPPublicKeyRing) {
+                    mergedKeyRing = PGPPublicKeyRing.join(existingCert, (PGPPublicKeyRing) updatedKeyRing);
+                } else if (updatedKeyRing instanceof PGPSecretKeyRing) {
+                    PGPPublicKeyRing updatedPublicKeys = PGPainless.extractCertificate((PGPSecretKeyRing) updatedKeyRing);
+                    PGPPublicKeyRing mergedPublicKeys = PGPPublicKeyRing.join(existingCert, updatedPublicKeys);
+                    updatedKeyRing = PGPSecretKeyRing.replacePublicKeys((PGPSecretKeyRing) updatedKeyRing, mergedPublicKeys);
+                    mergedKeyRing = updatedKeyRing;
+                } else {
+                    throw new IOException(new BadDataException());
+                }
+                return mergedKeyRing;
+            }
+
+            private PGPKeyRing mergeWithKey(PGPKeyRing existingKeyRing, PGPKeyRing updatedKeyRing)
+                    throws PGPException, IOException {
+                PGPKeyRing mergedKeyRing;
+                PGPSecretKeyRing existingKey = (PGPSecretKeyRing) existingKeyRing;
+                PGPPublicKeyRing existingCert = PGPainless.extractCertificate(existingKey);
+                if (updatedKeyRing instanceof PGPPublicKeyRing) {
+                    PGPPublicKeyRing updatedCert = (PGPPublicKeyRing) updatedKeyRing;
+                    PGPPublicKeyRing mergedCert = PGPPublicKeyRing.join(existingCert, updatedCert);
+                    mergedKeyRing = PGPSecretKeyRing.replacePublicKeys(existingKey, mergedCert);
+                } else if (updatedKeyRing instanceof PGPSecretKeyRing) {
+                    // Merging keys is not supported
+                    mergedKeyRing = existingKeyRing;
+                } else {
+                    throw new IOException(new BadDataException());
+                }
+                return mergedKeyRing;
+            }
+
+            private KeyMaterial toKeyMaterial(PGPKeyRing mergedKeyRing)
+                    throws IOException {
+                if (mergedKeyRing instanceof PGPPublicKeyRing) {
+                    return CertificateFactory.certificateFromPublicKeyRing((PGPPublicKeyRing) mergedKeyRing, null);
+                } else {
+                    return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) mergedKeyRing, null);
                 }
             }
 
@@ -145,23 +161,7 @@ public class MergeCallbacks {
         };
     }
 
-    /**
-     * Return an implementation of {@link KeyMaterialMerger} that ignores the existing certificate and instead
-     * returns the first instance.
-     *
-     * @return overriding callback
-     */
-    public static KeyMaterialMerger overrideCertificate() {
-        // noinspection Convert2Lambda
-        return new KeyMaterialMerger() {
-            @Override
-            public KeyMaterial merge(KeyMaterial data, KeyMaterial existing) {
-                return data;
-            }
-        };
-    }
-
-    public static KeyMaterialMerger overrideKey() {
+    public static KeyMaterialMerger overrideExisting() {
         // noinspection Convert2Lambda
         return new KeyMaterialMerger() {
             @Override

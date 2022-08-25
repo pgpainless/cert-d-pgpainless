@@ -24,7 +24,7 @@ public class Insert implements Runnable {
     public void run() {
         try {
             Certificate certificate = PGPCertDCli.getCertificateDirectory()
-                    .insert(System.in, MergeCallbacks.mergeCertificates());
+                    .insert(System.in, MergeCallbacks.mergeWithExisting());
         } catch (IOException e) {
             LOGGER.error("IO-Error.", e);
             System.exit(-1);
