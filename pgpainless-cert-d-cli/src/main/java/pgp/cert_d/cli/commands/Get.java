@@ -27,6 +27,10 @@ public class Get implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Get.class);
 
+    // https://www.cyberciti.biz/faq/linux-bash-exit-status-set-exit-statusin-bash/
+    public static final int EXIT_CODE_NO_SUCH_ELEMENT = 2;
+    public static final int EXIT_CODE_IO_ERROR = 5;
+
     @CommandLine.Option(names = {"-a", "--armor"})
     boolean armor = false;
 
@@ -60,9 +64,10 @@ public class Get implements Runnable {
 
         } catch (NoSuchElementException e) {
             LOGGER.debug("Certificate not found.", e);
+            System.exit(EXIT_CODE_NO_SUCH_ELEMENT);
         } catch (IOException e) {
             LOGGER.error("IO Error", e);
-            System.exit(-1);
+            System.exit(EXIT_CODE_IO_ERROR);
         } catch (BadDataException e) {
             LOGGER.error("Certificate file contains bad data.", e);
             System.exit(-1);

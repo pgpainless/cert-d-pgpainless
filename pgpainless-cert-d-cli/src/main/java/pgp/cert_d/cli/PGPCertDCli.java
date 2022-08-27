@@ -42,11 +42,14 @@ public class PGPCertDCli {
 
     static PGPainlessCertD certificateDirectory;
 
+    // https://www.cyberciti.biz/faq/linux-bash-exit-status-set-exit-statusin-bash/
+    public static final int EXIT_CODE_NOT_A_STORE = 30;
+
     private int executionStrategy(CommandLine.ParseResult parseResult) {
         try {
             initStore();
         } catch (NotAStoreException | SQLException e) {
-            return -1;
+            return EXIT_CODE_NOT_A_STORE;
         }
         return new CommandLine.RunLast().execute(parseResult);
     }
