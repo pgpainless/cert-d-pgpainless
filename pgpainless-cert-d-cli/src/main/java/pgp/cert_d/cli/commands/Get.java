@@ -19,6 +19,7 @@ import pgp.certificate_store.exception.BadNameException;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @CommandLine.Command(name = "get",
         resourceBundle = "msg_get")
@@ -57,6 +58,8 @@ public class Get implements Runnable {
                 Streams.pipeAll(record.getInputStream(), System.out);
             }
 
+        } catch (NoSuchElementException e) {
+            LOGGER.debug("Certificate not found.", e);
         } catch (IOException e) {
             LOGGER.error("IO Error", e);
             System.exit(-1);

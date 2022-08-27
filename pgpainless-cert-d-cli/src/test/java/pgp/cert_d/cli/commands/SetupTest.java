@@ -27,11 +27,12 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SetupTest {
@@ -53,7 +54,7 @@ public class SetupTest {
     @Test
     public void testSetupGeneratesTrustRoot()
             throws BadDataException, IOException {
-        assertNull(store.getTrustRoot());
+        assertThrows(NoSuchElementException.class, () -> store.getTrustRoot());
 
         PGPCertDCli.main(new String[] {"setup"});
         KeyMaterial trustRoot = store.getTrustRoot();
@@ -68,7 +69,7 @@ public class SetupTest {
     @Test
     public void testSetupWithPassword()
             throws BadDataException, IOException, PGPException {
-        assertNull(store.getTrustRoot());
+        assertThrows(NoSuchElementException.class, () -> store.getTrustRoot());
 
         PGPCertDCli.main(new String[] {"setup", "--with-password", "sw0rdf1sh"});
         KeyMaterial trustRoot = store.getTrustRoot();
@@ -87,7 +88,7 @@ public class SetupTest {
     public void testSetupImportFromStdin()
             throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException,
             BadDataException, IOException {
-        assertNull(store.getTrustRoot());
+        assertThrows(NoSuchElementException.class, () -> store.getTrustRoot());
 
         PGPSecretKeyRing trustRoot = PGPainless.generateKeyRing()
                 .modernKeyRing("trust-root");
@@ -108,7 +109,7 @@ public class SetupTest {
     @Test
     public void testSetupOverridesExistingTrustRoot()
             throws BadDataException, IOException {
-        assertNull(store.getTrustRoot());
+        assertThrows(NoSuchElementException.class, () -> store.getTrustRoot());
 
         PGPCertDCli.main(new String[] {"setup"});
         KeyMaterial trustRoot = store.getTrustRoot();

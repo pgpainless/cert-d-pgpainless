@@ -7,7 +7,7 @@ package org.pgpainless.cert_d;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -74,8 +75,8 @@ public class SharedPGPCertificateDirectoryTest {
         OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(cert);
         ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
 
-        // standard case: get() is null
-        assertNull(directory.getByFingerprint(fingerprint.toString().toLowerCase()));
+        // standard case: no cert found
+        assertThrows(NoSuchElementException.class, () -> directory.getByFingerprint(fingerprint.toString().toLowerCase()));
 
         // insert and check returned certs fingerprint
         Certificate certificate = directory.insert(certIn, dummyMerge);
@@ -99,8 +100,8 @@ public class SharedPGPCertificateDirectoryTest {
         OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(trustRoot);
         ByteArrayInputStream certIn = new ByteArrayInputStream(trustRoot.getEncoded());
 
-        // standard case: get() is null
-        assertNull(directory.getBySpecialName("trust-root"));
+        // standard case: no cert found
+        assertThrows(NoSuchElementException.class, () -> directory.getBySpecialName("trust-root"));
 
         // insert and check returned certs fingerprint
         Certificate certificate = directory.insertWithSpecialName("trust-root", certIn, dummyMerge);
