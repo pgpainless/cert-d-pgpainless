@@ -34,16 +34,16 @@ public class Get implements Runnable {
             paramLabel = "IDENTIFIER",
             arity = "1"
     )
-    String identifer;
+    String identifier;
 
     @Override
     public void run() {
         try {
             KeyMaterial record;
-            if (SpecialNames.lookupSpecialName(identifer) != null) {
-                record = PGPCertDCli.getCertificateDirectory().getBySpecialName(identifer);
+            if (SpecialNames.lookupSpecialName(identifier) != null) {
+                record = PGPCertDCli.getCertificateDirectory().getBySpecialName(identifier);
             } else {
-                record = PGPCertDCli.getCertificateDirectory().getByFingerprint(identifer.toLowerCase());
+                record = PGPCertDCli.getCertificateDirectory().getByFingerprint(identifier.toLowerCase());
             }
             if (record == null) {
                 return;
