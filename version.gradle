@@ -4,8 +4,8 @@
 
 allprojects {
     ext {
-        shortVersion = '0.1.3'
-        isSnapshot = true
+        shortVersion = '0.2.0'
+        isSnapshot = false
         minAndroidSdk = 10
         javaSourceCompatibility = 1.8
         slf4jVersion = '1.7.36'

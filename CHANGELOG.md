@@ -5,9 +5,19 @@ SPDX-License-Identifier: CC0-1.0
 
 # Cert-D-PGPainless Changelog
 
-## 0.1.3-SNAPSHOT
+## 0.2.0
 - `get`: Apply `toLowerCase()` to fingerprints
 - Use BCs `PGPPublicKeyRing.join(first, second)` method to properly merge certificates
+- Implement storing of `trust-root` key
+- Bump `cert-d-java` to `0.2.1`
+- Changes to CLI
+  - Add support for i18n using resource bundles
+  - Rename `import` command to `insert`
+  - Rename `multi-import` command to `import`
+  - Add `export` command
+  - Add basic `list` command
+  - `get` command: Allow querying by special name
+  - Add armor headers to output of `get` command
 
 ## 0.1.2
 - Add name and description to main command
