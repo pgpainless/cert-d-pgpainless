@@ -33,6 +33,9 @@ public class Import implements Runnable {
                 ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
                 Certificate certificate = PGPCertDCli.getCertificateDirectory()
                         .insert(certIn, MergeCallbacks.mergeWithExisting());
+                // CHECKSTYLE:OFF
+                System.out.println(certificate.getFingerprint());
+                // CHECKSTYLE:ON
             }
         } catch (IOException e) {
             LOGGER.error("IO-Error.", e);

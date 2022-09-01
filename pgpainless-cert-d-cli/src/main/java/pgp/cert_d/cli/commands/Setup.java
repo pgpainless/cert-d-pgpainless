@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.pgpainless.certificate_store.MergeCallbacks;
 import pgp.cert_d.cli.PGPCertDCli;
+import pgp.certificate_store.certificate.KeyMaterial;
 import pgp.certificate_store.exception.BadDataException;
 import picocli.CommandLine;
 
@@ -61,7 +62,11 @@ public class Setup implements Runnable {
 
         try {
             InputStream inputStream = new ByteArrayInputStream(trustRoot.getEncoded());
-            PGPCertDCli.getCertificateDirectory().insertTrustRoot(inputStream, MergeCallbacks.overrideExisting());
+            KeyMaterial inserted = PGPCertDCli.getCertificateDirectory()
+                    .insertTrustRoot(inputStream, MergeCallbacks.overrideExisting());
+            // CHECKSTYLE:OFF
+            System.out.println(inserted.getFingerprint());
+            // CHECKSTYLE:ON
 
         } catch (BadDataException e) {
             throw new RuntimeException(e);
