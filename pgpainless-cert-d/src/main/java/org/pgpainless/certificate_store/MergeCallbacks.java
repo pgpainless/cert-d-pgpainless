@@ -16,6 +16,7 @@ import pgp.certificate_store.certificate.KeyMaterialMerger;
 import pgp.certificate_store.exception.BadDataException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class MergeCallbacks {
@@ -107,7 +108,7 @@ public class MergeCallbacks {
                 }
             }
 
-            private void printOutDifferences(PGPKeyRing existingCert, PGPKeyRing mergedCert) {
+            private void printOutDifferences(PGPKeyRing existingCert, PGPKeyRing mergedCert) throws IOException {
                 int numSigsBefore = countSigs(existingCert);
                 int numSigsAfter = countSigs(mergedCert);
                 int newSigs = numSigsAfter - numSigsBefore;
@@ -115,7 +116,7 @@ public class MergeCallbacks {
                 int numUidsAfter = count(mergedCert.getPublicKey().getUserIDs());
                 int newUids = numUidsAfter - numUidsBefore;
 
-                if (!existingCert.equals(mergedCert)) {
+                if (!Arrays.equals(existingCert.getEncoded(), mergedCert.getEncoded())) {
                     OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(mergedCert);
                     StringBuilder sb = new StringBuilder();
                     sb.append(String.format("Certificate %s has", fingerprint));
