@@ -23,8 +23,13 @@ public class KeyMaterialReader implements KeyMaterialReaderBackend {
         try {
             keyMaterial = PGPainless.readKeyRing().keyRing(data);
         } catch (IOException e) {
-            if (e.getMessage().contains("unknown object in stream") ||
-                    e.getMessage().contains("unexpected end of file in armored stream.")) {
+            String msg = e.getMessage();
+            if (msg == null) {
+                throw e;
+            }
+            if (msg.contains("unknown object in stream") ||
+                    msg.contains("unexpected end of file in armored stream.") ||
+                    msg.contains("invalid header encountered")) {
                 throw new BadDataException();
             } else {
                 throw e;
