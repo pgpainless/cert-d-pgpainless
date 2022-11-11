@@ -5,7 +5,7 @@ SPDX-License-Identifier: CC0-1.0
 
 # Cert-D-PGPainless Changelog
 
-# 0.2.1-SNAPSHOT
+# 0.2.1
 - Bump `pgpainless-core` to `1.3.12`
 
 ## 0.2.0
