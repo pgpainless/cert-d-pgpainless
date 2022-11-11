@@ -5,6 +5,9 @@ SPDX-License-Identifier: CC0-1.0
 
 # Cert-D-PGPainless Changelog
 
+# 0.2.1-SNAPSHOT
+- Bump `pgpainless-core` to `1.3.12`
+
 ## 0.2.0
 - `get`: Apply `toLowerCase()` to fingerprints
 - Use BCs `PGPPublicKeyRing.join(first, second)` method to properly merge certificates
