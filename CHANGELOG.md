@@ -5,7 +5,11 @@ SPDX-License-Identifier: CC0-1.0
 
 # Cert-D-PGPainless Changelog
 
-# 0.2.1
+## 0.2.2
+- Bump `pgpainless-core` to `1.5.6`
+- Bump `cert-d-java` to `0.2.2`
+
+## 0.2.1
 - Bump `pgpainless-core` to `1.3.12`
 
 ## 0.2.0
