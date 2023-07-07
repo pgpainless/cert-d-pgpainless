@@ -4,7 +4,6 @@
 
 package pgp.cert_d.cli.commands;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.pgpainless.PGPainless;
@@ -45,9 +44,6 @@ public class Import implements Runnable {
             System.exit(-1);
         } catch (BadDataException e) {
             LOGGER.error("Certificate contains bad data.", e);
-            System.exit(-1);
-        } catch (PGPException e) {
-            LOGGER.error("PGP Exception.", e);
             System.exit(-1);
         }
     }
