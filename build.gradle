@@ -16,10 +16,6 @@ buildscript {
     }
 }
 
-plugins {
-    id 'ru.vyarus.animalsniffer' version '1.5.3'
-}
-
 apply from: 'version.gradle'
 
 allprojects {
@@ -38,7 +34,7 @@ allprojects {
 
     // checkstyle
     checkstyle {
-        toolVersion = '8.18'
+        toolVersion = '10.26.0'
     }
 
     group 'org.pgpainless'
@@ -65,8 +61,7 @@ allprojects {
         isReleaseVersion = !isSnapshot
         signingRequired = !(isSnapshot || isContinuousIntegrationEnvironment)
         sonatypeCredentialsAvailable = project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')
-        sonatypeSnapshotUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
-        sonatypeStagingUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+        sonatypeStagingUrl = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
     }
 
     if (isSnapshot) {
@@ -83,7 +78,7 @@ allprojects {
     }
 
     jacoco {
-        toolVersion = "0.8.7"
+        toolVersion = "0.8.13"
     }
 
     jacocoTestReport {
@@ -91,7 +86,7 @@ allprojects {
         sourceDirectories.setFrom(project.files(sourceSets.main.allSource.srcDirs))
         classDirectories.setFrom(project.files(sourceSets.main.output))
         reports {
-            xml.enabled true
+            xml.required = true
         }
     }
 
@@ -109,15 +104,15 @@ subprojects {
     apply plugin: 'signing'
 
     task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
+        archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from javadoc.destinationDir
     }
     task testsJar(type: Jar, dependsOn: testClasses) {
-        classifier = 'tests'
+        archiveClassifier = 'tests'
         from sourceSets.test.output
     }
 
@@ -161,7 +156,7 @@ subprojects {
         repositories {
             if (sonatypeCredentialsAvailable) {
                 maven {
-                    url isSnapshot ? sonatypeSnapshotUrl : sonatypeStagingUrl
+                    url sonatypeStagingUrl
                     credentials {
                         username = sonatypeUsername
                         password = sonatypePassword
@@ -214,7 +209,7 @@ task jacocoRootReport(type: JacocoReport) {
     classDirectories.setFrom(files(subprojects.sourceSets.main.output))
     executionData.setFrom(files(subprojects.jacocoTestReport.executionData))
     reports {
-        xml.enabled true
+        xml.required = true
         xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
     // We could remove the following setOnlyIf line, but then
@@ -225,10 +220,6 @@ task jacocoRootReport(type: JacocoReport) {
 }
 
 task javadocAll(type: Javadoc) {
-    def currentJavaVersion = JavaVersion.current()
-    if (currentJavaVersion.compareTo(JavaVersion.VERSION_1_9) >= 0) {
-        options.addStringOption("-release", "8");
-    }
     source subprojects.collect {project ->
         project.sourceSets.main.allJava }
     destinationDir = new File(buildDir, 'javadoc')

@@ -4,14 +4,13 @@
 
 package pgp.cert_d.cli.commands;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.KeyFlag;
 import org.pgpainless.key.generation.KeyRingBuilder;
 import org.pgpainless.key.generation.KeySpec;
 import org.pgpainless.key.generation.type.KeyType;
-import org.pgpainless.key.generation.type.eddsa.EdDSACurve;
+import org.pgpainless.key.generation.type.eddsa_legacy.EdDSALegacyCurve;
 import org.pgpainless.util.Passphrase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +23,6 @@ import picocli.CommandLine;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
 
 @CommandLine.Command(name = "setup",
         resourceBundle = "msg_setup")
@@ -86,12 +83,8 @@ public class Setup implements Runnable {
         if (passphrase != null) {
             builder.setPassphrase(passphrase);
         }
-        builder.setPrimaryKey(KeySpec.getBuilder(KeyType.EDDSA(EdDSACurve._Ed25519), KeyFlag.CERTIFY_OTHER));
-        try {
+        builder.setPrimaryKey(KeySpec.getBuilder(KeyType.EDDSA_LEGACY(EdDSALegacyCurve._Ed25519), KeyFlag.CERTIFY_OTHER));
         trustRoot = builder.build();
-        } catch (NoSuchAlgorithmException | PGPException | InvalidAlgorithmParameterException e) {
-            throw new RuntimeException("Cannot generate trust-root OpenPGP key", e);
-        }
         return trustRoot;
     }
 

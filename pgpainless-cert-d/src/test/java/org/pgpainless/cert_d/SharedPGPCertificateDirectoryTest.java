@@ -36,7 +36,7 @@ import org.pgpainless.certificate_store.PGPainlessCertD;
 import org.pgpainless.key.OpenPgpFingerprint;
 import org.pgpainless.key.generation.KeySpec;
 import org.pgpainless.key.generation.type.KeyType;
-import org.pgpainless.key.generation.type.eddsa.EdDSACurve;
+import org.pgpainless.key.generation.type.eddsa_legacy.EdDSALegacyCurve;
 import pgp.cert_d.subkey_lookup.InMemorySubkeyLookupFactory;
 import pgp.certificate_store.certificate.Certificate;
 import pgp.certificate_store.certificate.KeyMaterial;
@@ -94,7 +94,7 @@ public class SharedPGPCertificateDirectoryTest {
             BadDataException, InterruptedException, BadNameException {
         PGPSecretKeyRing key = PGPainless.buildKeyRing()
                 .addUserId("trust-root")
-                .setPrimaryKey(KeySpec.getBuilder(KeyType.EDDSA(EdDSACurve._Ed25519), KeyFlag.CERTIFY_OTHER))
+                .setPrimaryKey(KeySpec.getBuilder(KeyType.EDDSA_LEGACY(EdDSALegacyCurve._Ed25519), KeyFlag.CERTIFY_OTHER))
                 .build();
         PGPPublicKeyRing trustRoot = PGPainless.extractCertificate(key);
         OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(trustRoot);

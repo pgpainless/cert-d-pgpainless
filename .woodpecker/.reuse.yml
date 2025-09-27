@@ -1,7 +1,9 @@
 # Code is licensed properly
 # See https://reuse.software/
-pipeline:
+steps:
   reuse:
+    when:
+      branch: main
     image: fsfe/reuse:latest
     commands:
       - reuse lint

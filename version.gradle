@@ -7,12 +7,13 @@ allprojects {
         shortVersion = '0.2.3'
         isSnapshot = true
         minAndroidSdk = 10
-        javaSourceCompatibility = 1.8
+        javaSourceCompatibility = "11"
         slf4jVersion = '1.7.36'
-        logbackVersion = '1.2.11'
+        logbackVersion = '1.5.13'
         junitVersion = '5.8.2'
         mockitoVersion = '4.5.1'
-        pgpainlessVersion = '1.5.6'
+        bouncyCastleVersion = '1.82'
+        pgpainlessVersion = '1.7.7'
         pgpCertDJavaVersion = '0.2.2'
         picocliVersion = '4.6.3'
     }

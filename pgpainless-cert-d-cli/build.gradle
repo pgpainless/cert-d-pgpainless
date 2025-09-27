@@ -4,13 +4,14 @@
 
 plugins {
     id 'application'
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id 'com.gradleup.shadow' version '8.3.6'
 }
 
 group 'org.pgpainless'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -19,7 +20,8 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 
     // Logging
-    implementation ("org.slf4j:slf4j-nop:$slf4jVersion")
+    // implementation ("org.slf4j:slf4j-nop:$slf4jVersion")
+    implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
     // pgp.cert.d using PGPainless
     implementation project(":pgpainless-cert-d")

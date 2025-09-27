@@ -10,13 +10,10 @@ group 'org.pgpainless'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
-apply plugin: 'ru.vyarus.animalsniffer'
-
 dependencies {
-    // animal sniffer for ensuring Android API compatibility
-    signature "net.sf.androidscents.signature:android-api-level-${minAndroidSdk}:2.3.3_r2@signature"
 
     // JUnit
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
@@ -35,10 +32,6 @@ dependencies {
     // pgp.cert.d
     api "org.pgpainless:pgp-cert-d-java:$pgpCertDJavaVersion"
     api "org.pgpainless:pgp-certificate-store:$pgpCertDJavaVersion"
-}
-
-animalsniffer {
-    sourceSets = [sourceSets.main]
 }
 
 test {
