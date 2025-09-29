@@ -30,7 +30,7 @@ public class Find implements Runnable {
             throw new IllegalArgumentException("No subkey ID provided.");
         }
         identifier = identifier.trim();
-        long subkeyId = 0;
+        long subkeyId;
         try {
             OpenPgpFingerprint fingerprint = OpenPgpFingerprint.parse(identifier);
             subkeyId = fingerprint.getKeyId();
