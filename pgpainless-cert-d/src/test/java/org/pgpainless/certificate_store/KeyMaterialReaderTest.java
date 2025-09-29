@@ -13,6 +13,7 @@ import pgp.certificate_store.exception.BadDataException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -92,7 +93,7 @@ public class KeyMaterialReaderTest {
             "-----END PGP PUBLIC KEY BLOCK-----";
 
     private final KeyMaterialReader reader = new KeyMaterialReader();
-    private final Charset UTF8 = Charset.forName("UTF8");
+    private final Charset UTF8 = StandardCharsets.UTF_8;
 
     @Test
     public void readBadDataTest() {

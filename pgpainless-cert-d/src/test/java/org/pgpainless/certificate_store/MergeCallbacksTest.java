@@ -13,7 +13,7 @@ import pgp.certificate_store.exception.BadDataException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -229,7 +229,7 @@ public class MergeCallbacksTest {
     }
 
     private static KeyMaterial parse(String encoding) throws BadDataException, IOException {
-        return reader.read(new ByteArrayInputStream(encoding.getBytes(Charset.forName("UTF8"))), null);
+        return reader.read(new ByteArrayInputStream(encoding.getBytes(StandardCharsets.UTF_8)), null);
     }
 
     private static void assertEncodingEquals(KeyMaterial one, KeyMaterial two) throws IOException {
