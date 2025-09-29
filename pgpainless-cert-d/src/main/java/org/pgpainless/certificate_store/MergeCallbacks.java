@@ -5,19 +5,21 @@
 package org.pgpainless.certificate_store;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.api.OpenPGPCertificate;
+import org.bouncycastle.openpgp.api.OpenPGPKey;
 import org.pgpainless.PGPainless;
 import org.pgpainless.key.OpenPgpFingerprint;
 import pgp.certificate_store.certificate.KeyMaterial;
 import pgp.certificate_store.certificate.KeyMaterialMerger;
-import pgp.certificate_store.exception.BadDataException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class MergeCallbacks {
 
@@ -41,79 +43,95 @@ public class MergeCallbacks {
                     return data;
                 }
 
+                PGPainless api = PGPainless.getInstance();
+
+                OpenPGPCertificate existingCert = api.readKey().parseCertificateOrKey(existing.getInputStream());
+                OpenPGPCertificate updatedCert = api.readKey().parseCertificateOrKey(data.getInputStream());
+
+                OpenPGPCertificate mergedCert = mergeCertificates(updatedCert, existingCert);
+
+                printOutDifferences(existingCert, mergedCert);
+                return toKeyMaterial(mergedCert);
+            }
+
+            private OpenPGPCertificate mergeCertificates(OpenPGPCertificate updatedCertOrKey,
+                                                         OpenPGPCertificate existingCertOrKey) {
+                if (!existingCertOrKey.getKeyIdentifier().matchesExplicit(updatedCertOrKey.getKeyIdentifier())) {
+                    throw new IllegalArgumentException("Not the same OpenPGP key/certificate: Mismatched primary key.");
+                }
+
+                OpenPGPCertificate merged;
+
                 try {
-                    PGPKeyRing existingKeyRing = PGPainless.readKeyRing().keyRing(existing.getInputStream());
-                    PGPKeyRing updatedKeyRing = PGPainless.readKeyRing().keyRing(data.getInputStream());
+                    if (existingCertOrKey.isSecretKey()) {
+                        OpenPGPKey existingKey = (OpenPGPKey) existingCertOrKey;
 
-                    PGPKeyRing mergedKeyRing;
+                        if (updatedCertOrKey.isSecretKey()) {
+                            // Merge key with key
+                            OpenPGPKey updatedKey = (OpenPGPKey) updatedCertOrKey;
+                            OpenPGPCertificate mergedCertPart = OpenPGPCertificate.join(
+                                    existingKey.toCertificate(),
+                                    updatedKey.toCertificate());
 
-                    if (existingKeyRing instanceof PGPPublicKeyRing) {
-                        mergedKeyRing = mergeWithCert((PGPPublicKeyRing) existingKeyRing, updatedKeyRing);
-                    } else if (existingKeyRing instanceof PGPSecretKeyRing) {
-                        mergedKeyRing = mergeWithKey(existingKeyRing, updatedKeyRing);
+                            List<PGPSecretKey> mergedSecretKeys = new ArrayList<>();
+                            Iterator<PGPSecretKey> existingKeysIterator = existingKey.getPGPSecretKeyRing().getSecretKeys();
+                            while (existingKeysIterator.hasNext()) {
+                                mergedSecretKeys.add(existingKeysIterator.next());
+                            }
+
+                            Iterator<PGPSecretKey> updatedKeysIterator = updatedKey.getPGPSecretKeyRing().getSecretKeys();
+                            while (updatedKeysIterator.hasNext()) {
+                                PGPSecretKey next = updatedKeysIterator.next();
+                                if (existingKey.getPGPSecretKeyRing().getSecretKey(next.getKeyIdentifier()) == null) {
+                                    mergedSecretKeys.add(next);
+                                }
+                            }
+                            PGPSecretKeyRing mergedSecretKeyRing = new PGPSecretKeyRing(mergedSecretKeys);
+                            merged = new OpenPGPKey(
+                                    PGPSecretKeyRing.replacePublicKeys(
+                                            mergedSecretKeyRing,
+                                            mergedCertPart.getPGPPublicKeyRing()));
+                        } else {
+                            // Merge key with cert
+                            OpenPGPCertificate mergedCertPart = OpenPGPCertificate.join(
+                                    existingKey.toCertificate(),
+                                    updatedCertOrKey);
+                            merged = new OpenPGPKey(
+                                    PGPSecretKeyRing.replacePublicKeys(
+                                            existingKey.getPGPSecretKeyRing(),
+                                            mergedCertPart.getPGPPublicKeyRing()));
+                        }
                     } else {
-                        throw new IOException(new BadDataException());
+                        if (updatedCertOrKey.isSecretKey()) {
+                            // Swap update and existing cert
+                            return mergeCertificates(existingCertOrKey, updatedCertOrKey);
+                        }
+
+                        // Merge cert with cert
+                        return OpenPGPCertificate.join(existingCertOrKey, updatedCertOrKey);
                     }
 
-                    printOutDifferences(existingKeyRing, mergedKeyRing);
-
-                    return toKeyMaterial(mergedKeyRing);
-
+                    return merged;
                 } catch (PGPException e) {
                     throw new RuntimeException(e);
                 }
             }
 
-            private PGPKeyRing mergeWithCert(PGPPublicKeyRing existingKeyRing, PGPKeyRing updatedKeyRing)
-                    throws PGPException, IOException {
-                PGPKeyRing mergedKeyRing;
-                PGPPublicKeyRing existingCert = existingKeyRing;
-                if (updatedKeyRing instanceof PGPPublicKeyRing) {
-                    mergedKeyRing = PGPPublicKeyRing.join(existingCert, (PGPPublicKeyRing) updatedKeyRing);
-                } else if (updatedKeyRing instanceof PGPSecretKeyRing) {
-                    PGPPublicKeyRing updatedPublicKeys = PGPainless.extractCertificate((PGPSecretKeyRing) updatedKeyRing);
-                    PGPPublicKeyRing mergedPublicKeys = PGPPublicKeyRing.join(existingCert, updatedPublicKeys);
-                    updatedKeyRing = PGPSecretKeyRing.replacePublicKeys((PGPSecretKeyRing) updatedKeyRing, mergedPublicKeys);
-                    mergedKeyRing = updatedKeyRing;
-                } else {
-                    throw new IOException(new BadDataException());
-                }
-                return mergedKeyRing;
-            }
-
-            private PGPKeyRing mergeWithKey(PGPKeyRing existingKeyRing, PGPKeyRing updatedKeyRing)
-                    throws PGPException, IOException {
-                PGPKeyRing mergedKeyRing;
-                PGPSecretKeyRing existingKey = (PGPSecretKeyRing) existingKeyRing;
-                PGPPublicKeyRing existingCert = PGPainless.extractCertificate(existingKey);
-                if (updatedKeyRing instanceof PGPPublicKeyRing) {
-                    PGPPublicKeyRing updatedCert = (PGPPublicKeyRing) updatedKeyRing;
-                    PGPPublicKeyRing mergedCert = PGPPublicKeyRing.join(existingCert, updatedCert);
-                    mergedKeyRing = PGPSecretKeyRing.replacePublicKeys(existingKey, mergedCert);
-                } else if (updatedKeyRing instanceof PGPSecretKeyRing) {
-                    // Merging keys is not supported
-                    mergedKeyRing = existingKeyRing;
-                } else {
-                    throw new IOException(new BadDataException());
-                }
-                return mergedKeyRing;
-            }
-
-            private KeyMaterial toKeyMaterial(PGPKeyRing mergedKeyRing)
+            private KeyMaterial toKeyMaterial(OpenPGPCertificate mergedCertificate)
                     throws IOException {
-                if (mergedKeyRing instanceof PGPPublicKeyRing) {
-                    return CertificateFactory.certificateFromPublicKeyRing((PGPPublicKeyRing) mergedKeyRing, null);
+                if (mergedCertificate.isSecretKey()) {
+                    return KeyFactory.keyFromOpenPGPKey((OpenPGPKey) mergedCertificate, null);
                 } else {
-                    return KeyFactory.keyFromSecretKeyRing((PGPSecretKeyRing) mergedKeyRing, null);
+                    return CertificateFactory.certificateFromOpenPGPCertificate(mergedCertificate, null);
                 }
             }
 
-            private void printOutDifferences(PGPKeyRing existingCert, PGPKeyRing mergedCert) throws IOException {
+            private void printOutDifferences(OpenPGPCertificate existingCert, OpenPGPCertificate mergedCert) throws IOException {
                 int numSigsBefore = countSigs(existingCert);
                 int numSigsAfter = countSigs(mergedCert);
                 int newSigs = numSigsAfter - numSigsBefore;
-                int numUidsBefore = count(existingCert.getPublicKey().getUserIDs());
-                int numUidsAfter = count(mergedCert.getPublicKey().getUserIDs());
+                int numUidsBefore = count(existingCert.getAllUserIds().iterator());
+                int numUidsAfter = count(mergedCert.getAllUserIds().iterator());
                 int newUids = numUidsAfter - numUidsBefore;
 
                 if (!Arrays.equals(existingCert.getEncoded(), mergedCert.getEncoded())) {
@@ -140,11 +158,10 @@ public class MergeCallbacks {
                 }
             }
 
-            private int countSigs(PGPKeyRing keys) {
+            private int countSigs(OpenPGPCertificate keys) {
                 int numSigs = 0;
-                Iterator<PGPPublicKey> iterator = keys.getPublicKeys();
-                while (iterator.hasNext()) {
-                    PGPPublicKey key = iterator.next();
+                for (OpenPGPCertificate.OpenPGPComponentKey componentKey : keys.getKeys()) {
+                    PGPPublicKey key = componentKey.getPGPPublicKey();
                     numSigs += count(key.getSignatures());
                 }
                 return numSigs;

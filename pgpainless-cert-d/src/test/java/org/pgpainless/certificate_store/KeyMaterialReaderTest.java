@@ -16,11 +16,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class KeyMaterialReaderTest {
 
@@ -111,7 +111,7 @@ public class KeyMaterialReaderTest {
     public void readKeyTest() throws BadDataException, IOException {
         KeyMaterial keyMaterial = reader.read(new ByteArrayInputStream(KEY.getBytes(UTF8)), 12L);
         assertNotNull(keyMaterial);
-        assertTrue(keyMaterial instanceof Key);
+        assertInstanceOf(Key.class, keyMaterial);
         Key key = (Key) keyMaterial;
         assertEquals("b21aabbf15df0fda37424de9ad008384ad0a064c", key.getFingerprint());
         assertEquals(12L, key.getTag());
@@ -125,7 +125,7 @@ public class KeyMaterialReaderTest {
     public void readCertTest() throws BadDataException, IOException {
         KeyMaterial keyMaterial = reader.read(new ByteArrayInputStream(CERT.getBytes(UTF8)), null);
         assertNotNull(keyMaterial);
-        assertTrue(keyMaterial instanceof Certificate);
+        assertInstanceOf(Certificate.class, keyMaterial);
         Certificate certificate = (Certificate) keyMaterial;
         assertEquals("b21aabbf15df0fda37424de9ad008384ad0a064c", certificate.getFingerprint());
         assertNull(certificate.getTag());

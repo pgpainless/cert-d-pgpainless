@@ -12,8 +12,8 @@ allprojects {
         junitVersion = '5.8.2'
         mockitoVersion = '4.5.1'
         bouncyCastleVersion = '1.82'
-        pgpainlessVersion = '1.7.7'
-        pgpCertDJavaVersion = '0.2.2'
+        pgpainlessVersion = '2.0.0'
+        pgpCertDJavaVersion = '0.2.3'
         picocliVersion = '4.6.3'
     }
 }

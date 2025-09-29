@@ -14,8 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,14 +22,14 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.api.OpenPGPCertificate;
+import org.bouncycastle.openpgp.api.OpenPGPKey;
 import org.bouncycastle.util.io.Streams;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.KeyFlag;
+import org.pgpainless.algorithm.OpenPGPKeyVersion;
 import org.pgpainless.certificate_store.PGPainlessCertD;
 import org.pgpainless.key.OpenPgpFingerprint;
 import org.pgpainless.key.generation.KeySpec;
@@ -68,10 +66,11 @@ public class SharedPGPCertificateDirectoryTest {
     @ParameterizedTest
     @MethodSource("provideTestSubjects")
     public void simpleInsertGet(PGPainlessCertD directory)
-            throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
-            BadDataException, InterruptedException, BadNameException {
-        PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice");
-        PGPPublicKeyRing cert = PGPainless.extractCertificate(key);
+            throws IOException, BadDataException, InterruptedException {
+        OpenPGPKey key = PGPainless.getInstance()
+                .generateKey(OpenPGPKeyVersion.v4)
+                .modernKeyRing("Alice");
+        OpenPGPCertificate cert = key.toCertificate();
         OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(cert);
         ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
 
@@ -90,13 +89,14 @@ public class SharedPGPCertificateDirectoryTest {
     @ParameterizedTest
     @MethodSource("provideTestSubjects")
     public void simpleInsertGetBySpecialName(PGPainlessCertD directory)
-            throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
-            BadDataException, InterruptedException, BadNameException {
-        PGPSecretKeyRing key = PGPainless.buildKeyRing()
+            throws IOException, BadDataException, InterruptedException, BadNameException {
+        OpenPGPKey key = PGPainless.getInstance()
+                .buildKey(OpenPGPKeyVersion.v4)
                 .addUserId("trust-root")
                 .setPrimaryKey(KeySpec.getBuilder(KeyType.EDDSA_LEGACY(EdDSALegacyCurve._Ed25519), KeyFlag.CERTIFY_OTHER))
                 .build();
-        PGPPublicKeyRing trustRoot = PGPainless.extractCertificate(key);
+
+        OpenPGPCertificate trustRoot = key.toCertificate();
         OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(trustRoot);
         ByteArrayInputStream certIn = new ByteArrayInputStream(trustRoot.getEncoded());
 
@@ -115,20 +115,21 @@ public class SharedPGPCertificateDirectoryTest {
     @ParameterizedTest
     @MethodSource("provideTestSubjects")
     public void testGetItemsAndFingerprints(PGPainlessCertD directory)
-            throws PGPException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IOException,
-            BadDataException, InterruptedException, BadNameException {
+            throws IOException, BadDataException, InterruptedException, BadNameException {
 
-        PGPSecretKeyRing trustRootKey = PGPainless.generateKeyRing().modernKeyRing("Alice");
-        PGPPublicKeyRing trustRootCert = PGPainless.extractCertificate(trustRootKey);
+        OpenPGPKey trustRootKey = PGPainless.getInstance().generateKey(OpenPGPKeyVersion.v4)
+                .modernKeyRing("Alice");
+        OpenPGPCertificate trustRootCert = trustRootKey.toCertificate();
         OpenPgpFingerprint trustRootFingerprint = OpenPgpFingerprint.of(trustRootCert);
         ByteArrayInputStream trustRootCertIn = new ByteArrayInputStream(trustRootCert.getEncoded());
         directory.insertWithSpecialName("trust-root", trustRootCertIn, dummyMerge);
 
         final int certificateCount = 3;
-        Map<String, PGPPublicKeyRing> certificateMap = new HashMap<>();
+        Map<String, OpenPGPCertificate> certificateMap = new HashMap<>();
         for (int i = 0; i < certificateCount; i++) {
-            PGPSecretKeyRing key = PGPainless.generateKeyRing().modernKeyRing("Alice");
-            PGPPublicKeyRing cert = PGPainless.extractCertificate(key);
+            OpenPGPKey key = PGPainless.getInstance().generateKey(OpenPGPKeyVersion.v4)
+                    .modernKeyRing("Alice");
+            OpenPGPCertificate cert = key.toCertificate();
             OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(cert);
             certificateMap.put(fingerprint.toString().toLowerCase(), cert);
 

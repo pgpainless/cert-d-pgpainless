@@ -5,16 +5,13 @@
 package pgp.cert_d.cli.commands;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.api.OpenPGPKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pgpainless.PGPainless;
 import org.pgpainless.certificate_store.PGPainlessCertD;
 import org.pgpainless.key.OpenPgpFingerprint;
-import org.pgpainless.key.info.KeyInfo;
-import org.pgpainless.key.protection.UnlockSecretKey;
-import org.pgpainless.util.Passphrase;
 import pgp.cert_d.cli.InstantiateCLI;
 import pgp.cert_d.cli.PGPCertDCli;
 import pgp.certificate_store.certificate.Key;
@@ -24,12 +21,14 @@ import pgp.certificate_store.exception.BadDataException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,29 +58,29 @@ public class SetupTest {
         PGPCertDCli.main(new String[] {"setup"});
         KeyMaterial trustRoot = store.getTrustRoot();
         assertNotNull(trustRoot);
-        assertTrue(trustRoot instanceof Key);
+        assertInstanceOf(Key.class, trustRoot);
 
         // Check that key has no password
-        PGPSecretKeyRing secretKeys = PGPainless.readKeyRing().secretKeyRing(trustRoot.getInputStream());
-        assertTrue(KeyInfo.isDecrypted(secretKeys.getSecretKey()));
+        OpenPGPKey key = PGPainless.getInstance().readKey().parseKey(trustRoot.getInputStream());
+        assertFalse(key.getPrimarySecretKey().isLocked(), "trust-root MUST NOT be passphrase protected here");
     }
 
     @Test
     public void testSetupWithPassword()
-            throws BadDataException, IOException, PGPException {
+            throws BadDataException, IOException {
         assertThrows(NoSuchElementException.class, () -> store.getTrustRoot());
 
         PGPCertDCli.main(new String[] {"setup", "--with-password", "sw0rdf1sh"});
         KeyMaterial trustRoot = store.getTrustRoot();
         assertNotNull(trustRoot);
-        assertTrue(trustRoot instanceof Key);
+        assertInstanceOf(Key.class, trustRoot);
 
         // Check that key is encrypted
-        PGPSecretKeyRing secretKeys = PGPainless.readKeyRing().secretKeyRing(trustRoot.getInputStream());
-        assertTrue(KeyInfo.isEncrypted(secretKeys.getSecretKey()));
+        OpenPGPKey key = PGPainless.getInstance().readKey().parseKey(trustRoot.getInputStream());
+        assertTrue(key.getPrimarySecretKey().isLocked());
         // Check that password matches
-        assertNotNull(UnlockSecretKey.unlockSecretKey(
-                secretKeys.getSecretKey(), Passphrase.fromPassword("sw0rdf1sh")));
+        assertTrue(key.getPrimarySecretKey().isPassphraseCorrect("sw0rdf1sh".toCharArray()),
+                "Key MUST be able to be unlocked using passphrase");
     }
 
     @Test
@@ -90,12 +89,12 @@ public class SetupTest {
             BadDataException, IOException {
         assertThrows(NoSuchElementException.class, () -> store.getTrustRoot());
 
-        PGPSecretKeyRing trustRoot = PGPainless.generateKeyRing()
+        OpenPGPKey trustRoot = PGPainless.getInstance().generateKey()
                 .modernKeyRing("trust-root");
         OpenPgpFingerprint fingerprint = OpenPgpFingerprint.of(trustRoot);
-        String armored = PGPainless.asciiArmor(trustRoot);
+        String armored = trustRoot.toAsciiArmoredString();
         ByteArrayInputStream trustRootIn = new ByteArrayInputStream(
-                armored.getBytes(Charset.forName("UTF8")));
+                armored.getBytes(StandardCharsets.UTF_8));
 
         InputStream originalStdin = System.in;
         System.setIn(trustRootIn);

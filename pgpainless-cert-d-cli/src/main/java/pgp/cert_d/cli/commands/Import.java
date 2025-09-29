@@ -4,10 +4,8 @@
 
 package pgp.cert_d.cli.commands;
 
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import org.bouncycastle.openpgp.api.OpenPGPCertificate;
 import org.pgpainless.PGPainless;
-import org.pgpainless.key.OpenPgpFingerprint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.pgpainless.certificate_store.MergeCallbacks;
@@ -28,19 +26,19 @@ public class Import implements Runnable {
     @Override
     public void run() {
         try {
-            PGPPublicKeyRingCollection certificates = PGPainless.readKeyRing().publicKeyRingCollection(System.in);
-            for (PGPPublicKeyRing cert : certificates) {
-                ByteArrayInputStream certIn = new ByteArrayInputStream(cert.getEncoded());
+            java.util.List<OpenPGPCertificate> certsOrKeys = PGPainless.getInstance().readKey().parseKeysOrCertificates(System.in);
+            for (OpenPGPCertificate toInsert : certsOrKeys) {
                 try {
-                    Certificate certificate = PGPCertDCli.getCertificateDirectory()
-                            .insert(certIn, MergeCallbacks.mergeWithExisting());
-                    LOGGER.info(certificate.getFingerprint());
+                    Certificate inserted = PGPCertDCli.getCertificateDirectory().insert(
+                            new ByteArrayInputStream(toInsert.getEncoded()),
+                            MergeCallbacks.mergeWithExisting());
+                    LOGGER.info(inserted.getFingerprint());
                 } catch (BadDataException e) {
-                    LOGGER.error("Certificate " + OpenPgpFingerprint.of(cert) + " contains bad data.", e);
+                    LOGGER.error("Certificate " + toInsert.getKeyIdentifier() + " contains bad data.", e);
                 } catch (IOException e) {
-                    LOGGER.error("IO error importing certificate " + OpenPgpFingerprint.of(cert), e);
+                    LOGGER.error("IO error importing certificate " + toInsert.getKeyIdentifier(), e);
                 } catch (InterruptedException e) {
-                    LOGGER.error("Thread interrupted while importing certificate " + OpenPgpFingerprint.of(cert), e);
+                    LOGGER.error("Thread interrupted while importing certificate " + toInsert.getKeyIdentifier(), e);
                     System.exit(1);
                 }
             }

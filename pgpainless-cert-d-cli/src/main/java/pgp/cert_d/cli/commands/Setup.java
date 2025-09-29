@@ -4,9 +4,10 @@
 
 package pgp.cert_d.cli.commands;
 
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.api.OpenPGPKey;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.KeyFlag;
+import org.pgpainless.algorithm.OpenPGPKeyVersion;
 import org.pgpainless.key.generation.KeyRingBuilder;
 import org.pgpainless.key.generation.KeySpec;
 import org.pgpainless.key.generation.type.KeyType;
@@ -46,7 +47,7 @@ public class Setup implements Runnable {
 
     @Override
     public void run() {
-        PGPSecretKeyRing trustRoot;
+        OpenPGPKey trustRoot;
         if (exclusive == null) {
             trustRoot = generateTrustRoot(Passphrase.emptyPassphrase());
         } else {
@@ -76,9 +77,9 @@ public class Setup implements Runnable {
         }
     }
 
-    private PGPSecretKeyRing generateTrustRoot(Passphrase passphrase) {
-        PGPSecretKeyRing trustRoot;
-        KeyRingBuilder builder = PGPainless.buildKeyRing()
+    private OpenPGPKey generateTrustRoot(Passphrase passphrase) {
+        OpenPGPKey trustRoot;
+        KeyRingBuilder builder = PGPainless.getInstance().buildKey(OpenPGPKeyVersion.v4)
                 .addUserId("trust-root");
         if (passphrase != null) {
             builder.setPassphrase(passphrase);
@@ -88,9 +89,9 @@ public class Setup implements Runnable {
         return trustRoot;
     }
 
-    private PGPSecretKeyRing readTrustRoot(InputStream inputStream) {
+    private OpenPGPKey readTrustRoot(InputStream inputStream) {
         try {
-            PGPSecretKeyRing secretKeys = PGPainless.readKeyRing().secretKeyRing(inputStream);
+            OpenPGPKey secretKeys = PGPainless.getInstance().readKey().parseKey(inputStream);
             if (secretKeys == null) {
                 throw new BadDataException();
             }
