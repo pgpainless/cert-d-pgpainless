@@ -4,8 +4,8 @@
 
 allprojects {
     ext {
-        shortVersion = '0.2.3'
-        isSnapshot = false
+        shortVersion = '0.2.4'
+        isSnapshot = true
         javaSourceCompatibility = "11"
         slf4jVersion = '1.7.36'
         logbackVersion = '1.5.13'
